@@ -1,0 +1,52 @@
+options:
+	gui1Name: enchant-gui-1
+	gui2Name: enchant-gui-2
+	prefix: &d&lENCHANT &8|
+
+on right click on a enchanting table:
+	cancel event
+	insertEnchantGui(event-player)
+
+on inventory click:
+	set {_uuid} to player's uuid
+	if event-inventory is (metadata tag "{@gui1Name}" of player):
+		if event-slot is not 13:
+			cancel event
+		if event-slot is 41:
+			enchantGui(player, slot 13 of (metadata tag "{@gui1Name}" of player), 0)
+		else if event-slot is 39:
+			set {_item} to slot 13 of (metadata tag "{@gui1Name}" of player)
+			if {_item} is not air:
+				give player {_item}
+				set slot 13 of (metadata tag "{@gui1Name}" of player) to air
+				send "{@prefix} &eCanceled enchant, you have been given your item"
+	else if event-inventory is (metadata tag "{@gui2Name}" of player):
+		cancel event
+		if event-slot is 45:
+			event-slot is not barrier
+			enchantGui(player, slot 49 of (metadata tag "{@gui2Name}" of player), (metadata tag "{@gui2Name}-n" of player) - 1)
+		else if event-slot is 53:
+			event-slot is not barrier
+			enchantGui(player, slot 49 of (metadata tag "{@gui2Name}" of player), (metadata tag "{@gui2Name}-n" of player) + 1)
+		else if event-item is enchanted book:
+			set {_item} to enchant_execute(event-inventory, event-slot's index, player) 
+			set slot 49 of (metadata tag "{@gui2Name}" of player) to {_item}
+
+on inventory close:
+	if event-inventory is (metadata tag "{@gui1Name}" of player):
+		set {_item} to slot 13 of event-inventory
+		wait 1 tick
+		player's current inventory is not (metadata tag "{@gui2Name}" of player)
+		if {_item} is not air:
+			if player's inventory can hold {_item}:
+				give player {_item}
+			else:
+				drop {_item} at location of player without velocity
+			send "{@prefix} &eCanceled enchant, you have been given your item"
+	else if event-inventory is (metadata tag "{@gui2Name}" of player):
+		set {_item} to slot 49 of event-inventory 
+		if player's inventory can hold {_item}:
+			give player {_item}
+		else:
+			drop {_item} at location of player without velocity
+		send "{@prefix} &eSuccessfully enchanted &r%{_item}%"

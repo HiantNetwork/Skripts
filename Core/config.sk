@@ -1,0 +1,52 @@
+options:
+    prefix: &a&lCONFIG &7| &a
+    path: "plugins/Skript/scripts/hiant.yml"
+
+on load:
+    set {S} to "Beta"
+
+function config_loadYaml(): 
+    if yml {@path} is loaded:
+        unload yml "config"
+
+    load yml {@path} as "config"
+
+    if yml "config" is empty:
+        set yml value "season" from "config" to "SeasonNumber"
+        set yml value "messages.noperms" from "config" to "&cYou do not have permission for this"
+
+        set yml value "discord.links.mc-channel" from "config" to "DiscordChannelId"
+        set yml value "discord.token" from "config" to "BotToken"
+
+        set yml value "world" from "config" to "worldName"
+
+        save yml "config"
+
+    set {_values::*} to yml nodes from "config"
+    loop {_values::*}:
+        set {config::%loop-value%} to yml value loop-value from "config"
+
+command config [<text>] [<text>]:
+    aliases: conf
+    trigger:
+        if arg-1 is "load":
+            if player does not have permission "config.load":
+                send "{@prefix}%{config::messages.noperms}%"
+                stop 
+            config_loadYaml()
+            send "{@prefix}Sucessfully loaded the config"
+        else if arg-1 is "reload":
+            if player does not have permission "config.reload":
+                send "{@prefix}%{config::messages.noperms}%"
+                stop 
+            config_loadYaml()
+            send "{@prefix}Sucessfully reloaded the config"
+            send {config::world}
+
+on tab complete:
+    event-string is "/config" or "/conf"
+    set tab completions for position 1 to "load" and "reload"
+
+on load: 
+    config_loadYaml()
+    set {S} to {config::season}

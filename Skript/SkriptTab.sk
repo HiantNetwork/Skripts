@@ -1,0 +1,47 @@
+on tab complete:
+	if event-string is "/skript" or "/sk":
+		set tab completions for position 1 to "reload", "enable", "disable", "update", "info", "help"
+		set {_scripts.before::*} to all scripts
+		loop {_scripts.before::*}:
+			set {_loopvalue} to loop-value
+			replace "\" in {_loopvalue} with "/"
+			add {_loopvalue} to {_scripts::*}
+		set {_scripts.before.disabled::*} to disabled scripts
+		loop {_scripts.before.disabled::*}:
+			set {_loopvalue.disabled} to loop-value
+			replace "\" in {_loopvalue.disabled} with "/"
+			add {_loopvalue.disabled} to {_scripts.disabled::*}
+		set {_scripts.before.enabled::*} to enabled scripts
+		loop {_scripts.before.enabled::*}:
+			set {_loopvalue.enabled} to loop-value
+			replace "\" in {_loopvalue.enabled} with "/"
+			add {_loopvalue.enabled} to {_scripts.enabled::*}
+		if tab arg-1 is "reload":
+			set tab completions for position 2 to {_scripts.enabled::*}, "all", "config", "aliases", "scripts"
+			set {_num} to 2
+			loop 255 times:
+				add 1 to {_num}
+				set tab completions for position {_num} to ""
+		else if tab arg-1 is "enable":
+			set tab completions for position 2 to {_scripts.disabled::*}, "all"
+			set {_num} to 2
+			loop 255 times:
+				add 1 to {_num}
+				set tab completions for position {_num} to ""
+		else if tab arg-1 is "disable":
+			set tab completions for position 2 to {_scripts.enabled::*}, "all"
+			set {_num} to 2
+			loop 255 times:
+				add 1 to {_num}
+				set tab completions for position {_num} to ""
+		else if tab arg-1 is "update":
+			set tab completions for position 2 to "check", "changes", "download"
+			set {_num} to 2
+			loop 255 times:
+				add 1 to {_num}
+				set tab completions for position {_num} to ""
+		else:
+			set {_num} to 1
+			loop 255 times:
+				add 1 to {_num}
+				set tab completions for position {_num} to ""

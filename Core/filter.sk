@@ -1,0 +1,45 @@
+options:
+    filter: "%{list::*}%" or ""
+    nofilter: " hit" and "can "
+    permission: op
+
+function swear(m: text) :: boolean:
+    set {_m} to {_m} in lower case
+    replace every {@nofilter} in {_m} with ""
+    replace every " " in {_m} with ""
+    replace every "_" and "-" and "+" and "=" and "." and "," and "<" and ">" and "/" and "?" and ";" and ":" and "'" and """" and "\" and "|" and "]" and "[" and "{" and "}" and "`" and "~" and "!" and "##" and "@" and "$" and "%%" and "^" and "&" and "*" and "(" and ")" in {_m} with ""
+    set {_m2} to {_m}
+    replace every {@filter} in {_m2} with ""
+    replace every {list::*} in {_m2} with ""
+    if {_m} is {_m2}:
+        return false
+    else:
+        return true
+on chat:
+    swear(message) is true:
+        set {_deletedmessage} to message
+        cancel event
+        send "&3&l»&b You cannot say that word!"
+        send "&b[&3&lAnti-Swear&b] &3%player%&b attempted to say &3'%{_deletedmessage}%&3'&b but was filtered." to all players where [input has permission "{@permission}"]
+        stop
+        
+command addword [<text>]:
+    permission: staff.filter.add
+    trigger:
+        add arg-1 to {list::*}
+        send "&b[&3&lAnti-Swear&b] You have added to &3'%arg-1%&3' &bto the antiswear!" to player
+command delword [<text>]:
+    permission: staff.filter.remove
+    trigger:
+        remove arg-1 from {list::*}
+        send "&b[&3&lAnti-Swear&b] You have removed &3'%arg-1%&3' &bfrom the antiswear!" to player
+command listwords:
+	permission: staff.filter.list
+	trigger:
+		send " " to player
+		send " &b--------------------------------------" to player
+		send "&3&lFilter List:" to player
+		send " &b%{list::*}%" to player	
+		send " &b--------------------------------------" to player
+
+		send " " to player

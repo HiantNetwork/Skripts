@@ -1,0 +1,53 @@
+command /scoreboard:
+	trigger:
+		if {Scoreboard::%player's uuid%::toggle} is false:
+			set {Scoreboard::%player's uuid%::toggle} to true
+			send "&b&lHiant &6The scoreboard is now turned on."
+		else:
+			set {Scoreboard::%player's uuid%::toggle} to false
+			send "&b&lHiant &6The scoreboard is now turned off."
+
+function updateScoreboard(p: player):
+	set {_u} to {_p}'s uuid
+	set {_prefix} to {_p}'s prefix ? "&7Default"
+	set {_suffix} to {_p}'s suffix
+	if {_suffix} is "":
+		set {_suffix} to "&7None"
+
+	if {Deaths::%{S}%::%{_u}%} is 0:
+		set {_kdr} to "N/A"
+	else:
+		set {_kdr} to {Kills::%{S}%::%{_u}%}/{Deaths::%{S}%::%{_u}%}
+	set {_tps} to ("%tps from last 5 minutes%" parsed as number)
+	if {_tps} > 18:
+		set {_tps} to "&a%tps from last 5 minutes%"
+	else if {_tps} > 15:
+		set {_tps} to "&e%tps from last 5 minutes%"
+	else if {_tps} > 12:
+		set {_tps} to "&6%tps from last 5 minutes%"
+	else if {_tps} > 10:
+		set {_tps} to "&c%tps from last 5 minutes%"
+	else:
+		set {_tps} to "&4%tps from last 5 minutes%"
+	if {Scoreboard::%{_u}%::Toggle} is true:
+		toggle {_p}'s scoreboard on
+		set title of {_p}'s scoreboard to "&b&lHiant &8| &6%{config::season}%"
+		set line 13 of {_p}'s scoreboard to "&7"
+		set line 12 of {_p}'s scoreboard to "&7┏ &6%{_p}%"
+		set line 11 of {_p}'s scoreboard to "&7| &eRank &7- &a%{_prefix}%"
+		set line 10 of {_p}'s scoreboard to "&7| &eSuffix &7- &a%{_suffix}%"
+		set line 9 of {_p}'s scoreboard to "&7| &eKills &7- &a%{Kills::%{S}%::%{_u}%}%"
+		set line 8 of {_p}'s scoreboard to "&7| &eDeaths &7- &a%{Deaths::%{S}%::%{_u}%}%"
+		set line 7 of {_p}'s scoreboard to "&7┗ &eKDR &7- &a%{_kdr}%"
+		set line 6 of {_p}'s scoreboard to "&7"
+		set line 5 of {_p}'s scoreboard to "&7┏ &6Server"
+		set line 4 of {_p}'s scoreboard to "&7| &eTPS &7- %{_tps}%"
+		set line 3 of {_p}'s scoreboard to "&7┗ &ePlayers Online &7- &a%amount of players%"
+		set line 2 of {_p}'s scoreboard to "&7"
+		set line 1 of {_p}'s scoreboard to "&7Hiant.minehut.gg"
+	else:
+		toggle {_p}'s scoreboard off
+
+every 5 seconds:
+	loop all players:
+		updateScoreboard(loop-player)

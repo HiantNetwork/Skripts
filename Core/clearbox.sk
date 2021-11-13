@@ -1,0 +1,84 @@
+command clearbox:
+	permission: staff.clearbox
+	permission message: "&cAre you TRYING to cause lag?"
+	executable by: console
+	trigger:
+		if {server::clearingBox} is set:
+			send "&cThe box is already being cleared!"
+			stop
+		set {server::clearingBox} to true
+		
+		broadcast "&b"
+		broadcast "&6[Box Manager]&e The box is currently being reset, please be patient!"
+		broadcast "&b"
+		
+		wait 2 seconds
+		
+		set {_Spawn::Block1} to location at (-8, 106, -176) in world "S1"
+		set {_Spawn::Block2} to location at (0, 100, -176) in world "S1"
+		set {_Quadrants::StartBlock} to location at (-4, 1, -88) in world "S1"
+		
+		loop blocks within {_Spawn::Block1} and {_Spawn::Block2}:
+			set loop-block to tinted glass
+		
+		broadcast "&b"
+		broadcast "&6[Box Manager]&e During this process, you will not be able to leave spawn or speak."
+		broadcast "&b"
+		
+		loop all players:
+			wait 0.1 seconds
+			teleport loop-player to {spawn::%{S}%}
+		
+		set {_Quadrant::1::TopBlock} to location at (83, 254, -175) in world "S1"
+		
+		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::1::TopBlock}:
+			set loop-block to air
+			
+		broadcast "&b"
+		broadcast "&6[Box Manager]&a Quadrant One &6- &eCleared &6- &425%%"
+		broadcast "&b"
+		
+		wait 2 seconds
+		
+		set {_Quadrant::2::TopBlock} to location at (-91, 254, -175) in world "S1"
+		
+		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::2::TopBlock}: 	 
+			set loop-block to air
+			
+		broadcast "&b"
+		broadcast "&6[Box Manager]&a Quadrant Two &6- &eCleared &6- &e50%%"
+		broadcast "&b"
+		
+		set {_Quadrant::3::TopBlock} to location at (-91, 254, -1) in world "S1"
+		
+		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::3::TopBlock}: 	 
+			set loop-block to air
+			
+		broadcast "&b"
+		broadcast "&6[Box Manager]&a Quadrant Three &6- &eCleared &6- &675%%"
+		broadcast "&b"
+		
+		set {_Quadrant::4::TopBlock} to location at (83, 254, -1) in world "S1"
+		
+		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::4::TopBlock}: 	 
+			set loop-block to air
+			
+		broadcast "&b"
+		broadcast "&6[Box Manager]&a Quadrant Four &6- &eCleared &6- &a100%%"
+		broadcast "&b"
+		
+		loop blocks within {_Spawn::Block1} and {_Spawn::Block2}:
+			set loop-block to air
+		
+		wait 0.3 seconds
+			
+		broadcast "&b"
+		broadcast "&6[Box Manager] &eAll &aQuadrants&e have been cleared. You may now resume playing!"
+		broadcast "&b"
+		
+		delete {server::clearingBox}
+		
+on chat:
+	{server::clearingBox} is set
+	cancel event
+	send "&cYou cannot chat while the box is clearing"

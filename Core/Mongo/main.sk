@@ -1,0 +1,33 @@
+on script load:
+	set {mongo::connection} to mongo server with connection string {config::mongourl}
+	set {mongo::database} to mongo database "hiant" of {mongo::connection}
+	set {mongo::coll::playerdata} to mongo collection "playerdata" of {mongo::database}
+	
+function mongo_updatePlayerdata(p: player):
+	loop all players:
+		set {_doc} to first mongo document with mongosk filter where field "uuid" equals loop-player's uuid of collection {mongo::coll::playerdata}
+		set {_this} to true
+		if {_doc} isn't set:
+			set {_this} to false
+			set {_doc} to a new mongo document
+			set mongo field "uuid" of {_doc} to loop-player's uuid
+
+		set mongo field "kills" of {_doc} to {kills::%{S}%::%loop-player's uuid%}
+		set mongo field "deaths" of {_doc} to {deaths::%{S}%::%loop-player's uuid%}
+		set mongo field "ign" of {_doc} to loop-player's name 
+		set mongo list "joins" of {_doc} to {playerdata::%loop-player's uuid%::joins::*}
+		set mongo field "firstjoin" of {_doc} to {playerdata::%loop-player's uuid%::firstjoin}
+
+		send {_this} to {_p}
+
+		if {_this} is false:
+			insert mongo document {_doc} into collection {mongo::coll::playerdata}
+		else:
+			update mongo document {_doc} of {mongo::coll::playerdata}
+
+command mongo [<text>]:
+	trigger:
+		if arg-1 is "update":
+			mongo_updatePlayerdata(player)
+			send "Updated database"
+	

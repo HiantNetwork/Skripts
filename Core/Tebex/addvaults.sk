@@ -1,0 +1,5 @@
+command addvaults <offline player> <number>:
+    executable by: console 
+    trigger:
+        add arg-2 to {TotalPlayerVaults::%arg-1's uuid%}
+        execute console command "lp user %arg-1% permission set playervaults.amount.%{TotalPlayerVaults::%arg-1's uuid%}% true"

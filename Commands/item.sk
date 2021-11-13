@@ -1,0 +1,15 @@
+command /item <string> [<integer>] [<string>]:
+	aliases: /i
+	permission: skript.item
+	usage: &cUsage: /item (item) [amount] [name]
+	trigger:
+		set {_amount} to arg-2
+		if arg-2 is not set:
+			set {_amount} to 1
+		set {_item} to arg-1
+		replace all "_" in {_item} with " "
+		set {_item} to ({_item} parsed as an item)
+		set {_name} to (name of {_item})
+		if arg-3 is set:
+			set {_name} to colored "&f%arg-3%"
+		give {_amount} of {_item} named {_name} to player

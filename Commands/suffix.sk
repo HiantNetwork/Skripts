@@ -1,0 +1,69 @@
+command /suffix:
+	permission: skript.suffix.use
+	permission message: &cInsufficient Permissions!
+	usage: /suffix
+	trigger:
+		set metadata tag "suffix" of player to chest inventory with 1 row named "&c&lSuffixes"
+		set {_inv} to (metadata tag "suffix" of player)
+		set {_i} to -1
+		loop 9 times:
+			add 1 to {_i}
+			set slot {_i} of {_inv} to red stained glass pane named "&c"
+		if player has permission "skript.suffix.simp":
+			set slot 0 of {_inv} to nametag named "&d&l[SIMP]"
+		if player has permission "skript.suffix.pro":
+			set slot 1 of {_inv} to nametag named "&9&l[PRO]"
+		if player has permission "skript.suffix.special":
+			set slot 2 of {_inv} to nametag named "&b&l[SPECIAL]"
+		if player has permission "skript.suffix.god":
+			set slot 3 of {_inv} to nametag named "&6&l[GOD]"
+		if player has permission "skript.suffix.pvp":
+			set slot 4 of {_inv} to nametag named "&4&l[PVP]"
+		if player has permission "skript.suffix.diamond":
+			set slot 5 of {_inv} to nametag named "&b&l[DIAMOND]"
+		if player has permission "skript.suffix.legend":
+			set slot 6 of {_inv} to nametag named "&6&l[LEGEND]"
+		if player has permission "skript.suffix.lava":
+			set slot 7 of {_inv} to nametag named "&c&l[LAVA]"
+		set slot 8 of {_inv} to nametag named "&cClear"
+		open {_inv} to player
+
+on inventory click:
+	if event-inventory is (metadata tag "suffix" of player):
+		cancel event
+		set {_inv} to (metadata tag "suffix" of player)
+		if event-slot's index is 0:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &d&l[Simp]"
+		else if event-slot's index is 1:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &9&l[PRO]"
+		else if event-slot's index is 2:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &b&l[SPECIAL]"
+		else if event-slot's index is 3:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &6&l[GOD]"
+		else if event-slot's index is 4:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &4&l[PVP]"
+		else if event-slot's index is 5:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &b&l[DIAMOND]"
+		else if event-slot's index is 6:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &6&l[LEGEND]"
+		else if event-slot's index is 7:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"
+			execute console command "lp user %player% meta addsuffix 1 &c&l[LAVA]"
+		else if event-slot's index is 8:
+			slot (event-slot's index) of {_inv} is not red stained glass pane named "&c"
+			execute console command "lp user %player% meta removesuffix 1"

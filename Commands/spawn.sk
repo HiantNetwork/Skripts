@@ -1,0 +1,21 @@
+command /setspawn:	
+	permission: op	
+	trigger:		
+		set {spawn::%{S}%} to location of block at location of player
+		send "&bSpawn Location: &c&l%{spawn::%{S}%}%" to player
+
+command /spawn:
+	trigger: 
+		if {PvPTag::%{S}%::%player's uuid%} is true:
+			send "&cYou cannot use this command while in combat!" to player
+		if {spawncooldown::%player's uuid%} is true:
+			send "&cYou cannot use this command while on cooldown!" to player
+		else:
+			set {spawncooldown::%player's uuid%} to true
+			teleport player to {spawn::%{S}%}
+			wait 3 seconds
+			set {spawncooldown::%player's uuid%} to false
+
+on join:
+	teleport player to {spawn::%{S}%}
+	set {spawncooldown::%player's uuid%} to false

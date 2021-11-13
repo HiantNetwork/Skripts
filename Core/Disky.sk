@@ -1,0 +1,110 @@
+options:
+	botname: Hiant
+	minecraftchat: 899003636972130416
+	bugchannel: 906004761285898240
+	format: **%uncolored player's prefix%**%uncolored {Nickname::%player's uuid%}%: %{_msg}%
+	discordformat: &6&l[Discord] &e%{_player}% &8» &f%event-message%
+	rformat: **%player%** has reported a bug! They claim the following,  ```%arg%```
+	reportchannel: 906007338501173309
+	reportformat: **%player%** has reported **{reported}** for
+
+on load:
+	login to {config::discord.token} with name "{@botname}"
+	make embed:
+		set color of the embed to light blue
+		set author of the embed to "The server is now online"
+	send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+	make new discord command:
+		set discord name of command to "link"
+		set description of command to "Link your account to minecraft!"
+		register require option STRING with id "link" and with description "Link your account to minecraft!" to command
+	add command builder to {_cmd::*}
+	create {_cmd::*} with bot named "{@botname}"	
+
+on unload:
+	make embed:
+		set color of the embed to light blue
+		set author of the embed to "The server is now online"
+		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+on chat:
+	set {_msg} to message 
+	set {_this::*} to split "_.*.>.|.`" at "."
+	loop {_this::*}:
+		replace all loop-value in {_msg} with "\%loop-value%"
+	replace all "@" in {_msg} with "||@||"
+	send "{@format}" to channel with id "{@minecraftchat}" with bot "{@botname}"
+
+on guild message receive seen by "{@botname}":
+	if event-channel is channel with id "{@minecraftchat}":
+		if event-member is a discord bot:
+			stop
+		else:
+			set {_player} to "%discord name of event-member%##%discord tag of event-member%"
+			broadcast "{@discordformat}"
+			stop
+
+on first join:
+	make embed:
+		set color of the embed to green
+		set author of the embed to "%player% join for first time"
+		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+		
+on join:
+	make embed:
+		set color of the embed to light blue
+		set author of the embed to "%player% joined"
+		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+
+on quit:
+	make embed:
+		set color of the embed to red
+		set author of the embed to "%player% left"
+		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+
+on death:
+	victim is a player
+	make embed:
+		set color of the embed to black
+		if attacker is a player:
+			set author of the embed to "%victim% was slain by %attacker%"		
+		if attacker is a player:
+			if projectile is set:
+				set author of the embed to "%victim% was shot by %attacker%"	
+		if damage was caused by potion:
+			set author of the embed to "%victim% was killed by spooky witch magic"
+		else:
+			set author of the embed to "%victim% died."			
+		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"	
+	
+discord command link [<offline player>] [<number>]:
+	prefixes: !
+	trigger:
+		if arg-2 is {linkcode.%arg-1%}:
+			send "**You have successfully linked!**" to event-channel with bot "{@botname}"
+			set {discordids::%arg-1's uuid%} to discord id of event-member
+		else:
+			send "**Invalid link code!**" to event-channel with bot "{@botname}"
+			
+command /bug [<text>]:
+	trigger:
+		if arg-1 is not set:
+			send "&b&lBUG &8| &aPlease enter the bug you want to report"
+		else:
+			send "{@rformat}" to channel with id "{@bugchannel}" with bot "{@botname}"
+
+command link:
+	trigger:
+		if {linked.%player%} is true:
+			send "&cYou have already linked your account!" to player
+			stop
+		else:
+			set {linking.%player%} to true
+			set {linkcode.%player%} to random integer between 1000 and 9999
+			send "&bYou are now linking!" to player
+			send " " to player
+			send "&3 Link Code:&c %{linkcode.%player%}%" to player
+			send " " to player
+			send "&bType the command &c!link USERNAME CODE &b on discord to link!" to player
+			wait 5 minutes
+			delete {linking.%player%}
+			delete {linkcode.%player%}

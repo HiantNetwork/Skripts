@@ -1,0 +1,62 @@
+options:
+	prefix: &9&lLeaderboards &8|
+
+command leaderboards [<text>] [<text>]:
+	permission: core.leaderboards.use 
+	trigger:
+		if arg-1 is "kills":
+			if arg-2 is "update":
+				lb_updateKillsLeaderboard()
+				send "{@prefix} &aUpdated the kills hologram"
+		if arg-1 is "kiss":
+			if arg-2 is "update":
+				lb_updateKissLeaderboard()
+				send "{@prefix} &aUpdated the kiss hologram"
+
+every 30 seconds:
+	lb_updateKissLeaderboard()
+	lb_updateKillsLeaderboard()
+
+function lb_updateKissLeaderboard():
+	set {_uuids::*} to sortKisses()
+	set {_i} to 1
+	loop 10 times:
+		set {_p} to {_uuids::%{_i}%} parsed as offline player 
+		execute console command "/hd setline kiss %{_i} + 2% &a%{_i}%. &d%{_p}'s name% &7- &c%{Kiss::%{_uuids::%{_i}%}%}%"
+		add 1 to {_i}
+
+function sortKisses() :: objects:
+	set {_uuids1::*} to sorted kisses list
+	loop {_uuids1::*}:
+		set {_uuids::%loop-index%} to last element of {_uuids1::*}
+		remove {_uuids::%loop-index%} from {_uuids1::*}
+	set {_i} to 1
+	loop {_uuids::*}:
+		set {leaderboards::kisses::%{_uuids::%{_i}%}%} to {_i}
+		add 1 to {_i}
+	return {_uuids::*}
+
+function lb_updateKillsLeaderboard():
+	set {_uuids::*} to sortKills()
+	set {_i} to 1
+	loop 10 times:
+		set {_p} to {_uuids::%{_i}%} parsed as offline player 
+		execute console command "/hd setline kills %{_i} + 2% &a%{_i}%. &6%{_p}'s name% &7- &c%{kills::%{S}%::%{_uuids::%{_i}%}%}%"
+		add 1 to {_i}
+
+function sortKills() :: objects:
+	set {_uuids1::*} to sorted kills list
+	loop {_uuids1::*}:
+		set {_uuids::%loop-index%} to last element of {_uuids1::*}
+		remove {_uuids::%loop-index%} from {_uuids1::*}
+	set {_i} to 1
+	loop {_uuids::*}:
+		set {leaderboards::kills::%{_uuids::%{_i}%}%} to {_i}
+		add 1 to {_i}
+	return {_uuids::*}
+
+on placeholderapi placeholder request for the prefix "hiant":
+	if the identifier is "kissPlace":
+		set the result to "%{leaderboards::kisses::%player's uuid%}%"
+	else if the identifier is "killPlace":
+		set the result to "%{leaderboards::kills::%player's uuid%}%"

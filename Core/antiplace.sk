@@ -1,0 +1,12 @@
+options:
+	blocked: bedrock or end portal frame or barrier
+	permission: skript.antiplace.bypass
+
+on place of {@blocked}:
+	if player does not have permission "{@permission}":
+		cancel event
+
+on right click:
+	if player does not have permission "{@permission}":
+		if player is holding water bucket:
+			cancel event

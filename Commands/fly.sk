@@ -1,0 +1,22 @@
+command /fly [<player>]:
+	permission: skript.fly
+	permission message: &cThis command is a &c&lDonator&c only perk!
+	trigger:
+		if arg 1 is set:
+			if arg 1 cannot fly:
+				allow flight for arg 1
+				send "&7Your flight has been &aEnabled&7." to arg 1
+				send "&aEnabled &7flight for &e%arg 1%&7." to executor
+				stop
+			else if arg 1 can fly:
+				disallow flight for arg 1
+				send "&7Your flight has been &cDisabled&7." to arg 1
+				send "&cDisabled &7flight for &e%arg 1%&7." to executor
+				stop
+			stop
+		if player cannot fly:
+			allow flight for player
+			send "&7Your flight has been &aEnabled&7."
+		else if player can fly:
+			disallow flight for player
+			send "&7Your flight has been &cDisabled&7."

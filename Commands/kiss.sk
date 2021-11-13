@@ -1,0 +1,34 @@
+command kiss [<offline player>]:
+	trigger:
+		if {KissCooldown::%player's uuid%} is not set:
+			set {KissCooldown::%player's uuid%} to 0
+		if {KissCooldown::%player's uuid%} is 0:
+			if arg is set:
+				if arg is player:
+					broadcast "&d&l[KISS] &e%player%&c just kissed themselves, lonely XD"
+					player doesn't have permission "skript.kiss.cooldown.bypass"
+					set {KissCooldown::%player's uuid%} to 60
+				else:
+					if swear(arg's name) is true:
+						send "&d&l[HornyPatrol] &cYou can't kiss players with naughty names, silly goose"
+						stop
+					broadcast "&d&l[KISS] &e%player%&c just kissed &a%arg%&c, how cute &d❤"
+					add 1 to {Kiss::%arg's uuid%}
+					player doesn't have permission "skript.kiss.cooldown.bypass"
+					set {KissCooldown::%player's uuid%} to 60
+			else:
+				broadcast "&d&l[KISS] &e%player%&c just kissed themselves, lonely XD"
+				player doesn't have permission "skript.kiss.cooldown.bypass"
+				set {KissCooldown::%player's uuid%} to 60
+		else:
+			send "&d&l[HornyPatrol] &cYour currently on kiss cooldown. Calm down there buddy.&7(60 second cooldown)"
+
+every second:
+	loop all players:
+		if {KissCooldown::%loop-player's uuid%} > 0:
+			remove 1 from {KissCooldown::%loop-player's uuid%}
+
+on join:
+	set {KissCooldown::%player's uuid%} to 0
+	if {Kiss::%player's uuid%} is not set:
+		set {Kiss::%player's uuid%} to 0

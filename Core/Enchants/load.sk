@@ -1,0 +1,7 @@
+on load:
+    wait 5 seconds 
+    reload script "Core/Enchants/variables.sk"
+    wait 5 seconds 
+    reload script "Core/Enchants/functions.sk"
+    wait 5 seconds
+    reload script "Core/Enchants/main.sk"

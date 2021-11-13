@@ -1,0 +1,13 @@
+command /broadcast [<text>]:
+	permission: skript.broadcast
+	trigger:
+		broadcast " "
+		send "&b&lANNOUCEMENT: &6%formatted arg%" to all players
+		broadcast " "
+
+command /broadcastraw [<text>]:
+	permission: skript.broadcast
+	trigger:
+		broadcast " "
+		send "&6%formatted arg%" to all players
+		broadcast " "

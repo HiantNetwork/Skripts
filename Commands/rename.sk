@@ -1,0 +1,11 @@
+command rename [<text>]:
+	permission: skript.rename 
+	trigger:
+		if arg is not set:
+			send "&cYou need to set text in argument 1 to rename the item as"
+			stop
+		if player's tool is air:
+			send "&cYou can't rename air"
+			stop 
+		set the name of player's tool to colored arg
+		send "&aRenamed your held item to &r%colored arg%"

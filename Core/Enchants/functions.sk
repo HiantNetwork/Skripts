@@ -1,0 +1,97 @@
+options:
+	gui1Name: enchant-gui-1
+	gui2Name: enchant-gui-2
+	prefix: &d&lENCHANT &8|
+
+
+function insertEnchantGui(p: player):
+	set {_gui} to chest inventory with 6 rows named "&2&l&k00&r &d&lInsert Item To Enchant&r &2&l&k00"
+
+	set {_i} to 1
+	loop 27 times:
+		set slot {_i} of {_gui} to magenta stained glass pane named "&c"
+		add 2 to {_i}
+
+	set {_i} to 0
+	loop 27 times:
+		set slot {_i} of {_gui} to green stained glass pane named "&c"
+		add 2 to {_i}
+
+	set slots 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50 and 51 of {_gui} to black stained glass pane named "&c"
+	set slot 13 of {_gui} to air
+	set slot 41 of {_gui} to enchanting table named "&dProceed To Enchant" with lore "&eClick to proceed to enchanting section"
+	set slot 39 of {_gui} to barrier named "&cRemove Item" with lore "&eClick to get your item back and cancel the enchant"
+
+	set (metadata tag "{@gui1Name}" of {_p}) to {_gui}
+	open (metadata tag "{@gui1Name}" of {_p}) to {_p}
+
+function enchantGui(p: player, item: item, page: number):
+	loop {enchants::categories::*}:
+		{enchants::category::%loop-value%::items::*} contains {_item}
+		set {_type} to loop-value
+	if {_type} is not set:
+		close {_p}'s inventory
+		give {_p} {_item}
+		send "{@prefix} &cYou cannot enchant the item %{_item}%" to {_p}
+	set {_gui} to chest inventory with 6 rows named "   &2&l&k0000&r &d&lEnchant Menu&r &2&l&k0000"
+
+	set {_i} to 0
+	loop 56 times:
+		set slot {_i} of {_gui} to red stained glass pane named "&c"
+		add 1 to {_i}
+
+	set {_skull::1} to player skull with nbt "{display:{Name:""{\""text\"":\""Gray Arrow Left\""}""},SkullOwner:{Id:[I;-1620035141,-2078061139,-2011351746,470021397],Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19""}]}}}"
+	set {_skull::2} to player skull with nbt "{display:{Name:""{\""text\"":\""Gray Arrow Right\""}""},SkullOwner:{Id:[I;1917395862,-1007137920,-1567882985,-73443056],Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=""}]}}}"
+	set slot 45 of {_gui} to barrier named "&eLast page"
+	set slot 53 of {_gui} to barrier named "&eNext page"
+	
+	set slot 49 of {_gui} to {_item}
+
+	set {_gui} to enchant_format("sword", {_gui}, {_item}, {_page})
+	if ((size of {enchants::category::%{_type}%::enchants::*}) - ({_page}*9)) > 9:
+		set slot 53 of {_gui} to {_skull::1} named "&eNext page"
+	if {_page} > 0:
+		set slot 45 of {_gui} to {_skull::2} named "&eLast page"
+
+	set (metadata tag "{@gui2Name}" of {_p}) to {_gui}
+	set (metadata tag "{@gui2Name}-n" of {_p}) to {_page}
+	open (metadata tag "{@gui2Name}" of {_p}) to {_p}
+
+function enchant_format(type: string, gui: inventory, item: item, page: number) :: inventory:
+	set {_i} to 0
+	loop {enchants::category::%{_type}%::enchants::*}:
+		if {_i} > (({_page} * 9) - 1) :
+			{_i} < (({_page} + 1) * 9)
+			set {_name} to "%loop-value%"
+			replace all " " with "" in {_name}
+			set {_i2} to 1
+			loop {enchants::list::%{_name}%::max} times:
+				set slot (({_i} - ({_page}*9)) + 45 - ({_i2}*9)) of {_gui} to enchanted book named "&r&6%loop-value-1% %{_i2}%" with lore "&ePrice: %(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}% exp" and "&7ID - %{_name}%-%(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}%-%{_i2}%" # I fixed it.
+				add 1 to {_i2}
+		add 1 to {_i}
+	return {_gui}
+
+function enchant_execute(gui: inventory, slot: number, p: player) :: item:
+	set {_b} to slot {_slot} of {_gui}
+	set {_loreraw::*} to lore of {_b}
+	set {_id} to last (length of {_loreraw::2} - 7) characters of {_loreraw::2}
+	
+	set {_idSplit::*} to split {_id} at "-"
+
+	set {_enchant} to {_idSplit::1}
+	set {_price} to {_idSplit::2} parsed as an integer
+	set {_level} to {_idSplit::3}
+
+	set {_item} to slot 49 of {_gui}
+
+	broadcast "A: %{_enchant}% B: %{_price}% C: %{_level}%"
+
+	if {_p}'s level is more than or equal to {_price}:
+		enchant {_item} with ("%{_enchant}% %{_level}%" parsed as an enchantment type) # Fixed as of 10:57
+		play sound "block.note_block.pling" for {_p}
+		reduce {_p}'s level by {_price}
+	else:
+		play sound "entity.villager.no" for {_p}
+		send "{@prefix} &cNot enough xp for enchant" to {_p}
+
+	return {_item}

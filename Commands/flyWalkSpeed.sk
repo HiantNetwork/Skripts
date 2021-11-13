@@ -1,0 +1,40 @@
+command /speed [<text>] [<number>]:
+	executable by: players
+	permission: skript.fly.speed
+	permission message: &cYou don't have permission.
+	trigger:
+		if arg 1 is not set:
+			send "&8&m----------------------------"
+			send "&a&oPlease use &7fly&8/&7walk &8(&enumber&8)"
+			send "&7Available speed for fly and walk&8:"
+			send "&e1/2 or 3"
+			send "&8&m----------------------------"
+		else:
+			if arg 1 is "walk":
+				if arg 2 is not set:
+					send "&a&oPlease use&8: &7/speed walk (number)"
+				if arg 2 is 1:
+					set the player's walk speed to 0.2
+					message "&7Walking set back to normal."
+				if arg 2 is 2:
+					set the player's walk speed to 2
+					message "&7Walking speed set to 2."
+				if arg 2 is 3:
+					set the player's walk speed to 3
+					message "Walking speed set to 3."
+				if arg 2 is more than 3:
+					message "&cSorry, but you can only use at number 3"
+			if arg 1 is "fly":
+				if arg 2 is not set:
+					send "&a&oPlease use&8: &7/speed fly (number)"
+				if arg 2 is 1:
+					set the player's fly speed to 0.1
+					message "&7Fly speed set back to normal."
+				if arg 2 is 2:
+					set the player's fly speed to 2
+					message "&7Fly speed set to 2"
+				if arg 2 is 3:
+					set the player's fly speed to 3
+					message "&7Fly speed set to 3"
+				if arg 2 is more than 3:
+					message "&cSorry, but you can only use at number 3"

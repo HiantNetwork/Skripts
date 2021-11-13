@@ -1,0 +1,54 @@
+options:
+	staffprefix:&8[&4Staff&8]&7
+	scprefix:&8[&4StaffChat&8]&7
+
+command /mutechat:
+	permission: skript.staff.mutechat
+	permission message: &cThis is a staff only command
+	trigger:
+		if {Moderation::chatGlobalMute} is true:
+			set {Moderation::chatGlobalMute} to false
+			broadcast "&7Chat &aUnmuted &7by &e%player%"
+		else:
+			set {Moderation::chatGlobalMute} to true
+			broadcast "&7Chat &cMuted &7by &e%player%"
+			
+command /clearchat:
+	permission: skript.staff.clearchat
+	permission message: &cThis is a staff only command
+	trigger:
+		loop 200 times:
+			send "&b" to all players where [input does not have permission "staff.clearchat.bypass"]
+		wait 0.1 seconds
+		send "&4%player% &7has cleared the chat!" to all players where [input has permission "staff.clearchat.bypass"]
+		send "&7The chat has been &ccleared" to all players where [input does not have permission "staff.clearchat.bypass"]
+
+command /schat [<text>]:
+	aliases: /sc
+	permission: skript.staff.staffchat
+	permission message: &cThis is a staff only command
+	trigger:
+		if arg-1 is set:
+			send "{@scprefix} &c%player's display name%&f: &f%arg 1%" to all players where [player has permission "skript.staff.staffchat"]
+		else:
+			set {_m} to {Moderation::staffChat::%player's uuid%}
+			if {_m} is true:
+				set {Moderation::staffChat::%player's uuid%} to false
+				send "{@scprefix} &2Disabled"
+			else:
+				set {Moderation::staffChat::%player's uuid%} to true
+				send "{@scprefix} &2Enabled"
+
+on chat:
+	event is not cancelled
+	if {Moderation::staffChat::%player's uuid%} is true:
+		cancel event
+		send "{@scprefix} &c%player's display name%&f: &f%message%" to all players where [player has permission "sskript.staff.staffchat"]
+		stop
+	if {Moderation::chatGlobalMute} is true:
+		if player does not have permission "skript.staff.mutechat.bypass":
+			cancel event
+			send "&7You cannot speak whilst chat is &cMuted"
+			stop
+
+

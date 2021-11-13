@@ -1,0 +1,241 @@
+options:
+	owner: ("TrueFusion" parsed as an offline player)
+
+on join:
+	teleport player to {spawn::%{S}%}
+	if {Kills::%{S}%::%player's uuid%} is not set:
+		set {Kills::%{S}%::%player's uuid%} to 0
+	if {Deaths::%{S}%::%player's uuid%} is not set:
+		set {Deaths::%{S}%::%player's uuid%} to 0
+	set {PvPTag::%{S}%::%player's uuid%} to false
+	set {Immunity::%{S}%::%player's uuid%} to false
+
+on respawn:
+	teleport player to {spawn::%{S}%}
+
+on region enter: 
+	if "%region%" is "spawn in world %{config::world}%":
+		if {PvPTag::%{S}%::%player's uuid%} is true:
+			set gliding state of player to off
+			push player south with speed 4
+			send title "&cYou can't enter spawn while your in pvp" for 3 seconds
+
+on region enter:
+	if "%region%" is "box in world %{config::world}%":
+		send title "&c&lPvP Area" for 3 seconds
+		push player south with speed 2
+		{Immunity::%{S}%::%player's uuid%} is not true
+		set {Immunity::%{S}%::%player's uuid%} to true
+		sendActionBar(player, 20)
+		wait 201 ticks
+		send action bar "&cImmunity out" to player
+		set {Immunity::%{S}%::%player's uuid%} to false
+
+every tick:
+	loop all players:
+		if loop-player doesn't have permission "skript.region.bypass":
+			region at loop-player is not set 
+			teleport loop-player to {spawn::%{S}%}
+		if loop-player's y coordinate < 0:
+			teleport loop-player to {spawn::%{S}%}
+
+
+on region enter: 
+	if "%region%" is "spawn in world %{config::world}%":
+		if {PvPTag::%{S}%::%player's uuid%} is true:
+			push player north at speed 1
+			send title "&cYou can't enter spawn while you're in PVP!" for 3 seconds
+
+function sendActionBar(p: player, a: integer):
+	set {_n} to {_a} + 2
+	set {_e} to ""
+	loop ({_a} + 1) times:
+		remove 1 from {_n}
+		loop {_a} times:
+			add 1 to {_i}
+			if {_i} is greater than or equal to {_n}:
+				set {_e} to "%{_e}%&c|&r"
+			else:
+				set {_e} to "%{_e}%&a|&r"
+		set {_e} to "&8[%{_e}%&8]"
+		send action bar {_e} to {_p}
+		set {_e} to ""
+		delete {_i}
+		wait 10 ticks
+
+on damage:
+	if {Immunity::%{S}%::%victim's uuid%} is true:
+		if attacker is player:
+			send title "&7 " with subtitle "&c&lThat player is on immunity" to attacker
+		cancel event 
+	if {Immunity::%{S}%::%attacker's uuid%} is true:
+		if victim is player:
+			send title "&7 " with subtitle "&c&lYou can't attack people while on immunity" to attacker
+		cancel event 
+
+on damage:
+	event-world is world({config::world})
+	if attacker doesn't have permission "skript.nofly.bypass":
+		if attacker is player:
+			force attacker to stop flying
+		if victim is player:
+			force victim to stop flying
+	if {Immunity::%{S}%::%attacker's uuid%} is not true:
+		set {PvPTag::%{S}%::%attacker's uuid%} to true
+		set {PvPTagCooldown::%{S}%::%attacker's uuid%} to 0
+		if attacker is player:
+			set gliding state of attacker to off
+	if {Immunity::%{S}%::%victim's uuid%} is not true:
+		damage cause is not fall
+		set {PvPTag::%{S}%::%victim's uuid%} to true
+		set {PvPTagCooldown::%{S}%::%victim's uuid%} to 0
+		set gliding state of victim to off
+
+every 10 ticks:
+	loop all players:
+		loop-player's world is world({config::world})
+		{PvPTag::%{S}%::%loop-player's uuid%} is true
+		set gliding state of loop-player to off
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 10:
+			send action bar "&6PvP tag off" to loop-player
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 0
+			set {PvPTag::%{S}%::%loop-player's uuid%} to false
+			stop
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 9.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 10
+			send action bar "&7[&a|&c|||||||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 9:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 9.5
+			send action bar "&7[&a||&c||||||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 8.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 9
+			send action bar "&7[&a|||&c|||||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 8:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 8.5
+			send action bar "&7[&a||||&c||||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 7.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 8
+			send action bar "&7[&a|||||&c|||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 7:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 7.5
+			send action bar "&7[&a||||||&c||||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 6.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 7
+			send action bar "&7[&a|||||||&c|||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 6:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 6.5
+			send action bar "&7[&a||||||||&c||||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 5.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 6
+			send action bar "&7[&a|||||||||&c|||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 5.5
+			send action bar "&7[&a||||||||||&c||||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 4.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 5
+			send action bar "&7[&a|||||||||||&c|||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 4:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 4.5
+			send action bar "&7[&a||||||||||||&c||||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 3.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 4
+			send action bar "&7[&a|||||||||||||&c|||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 3:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 3.5
+			send action bar "&7[&a||||||||||||||&c||||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 2.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 3
+			send action bar "&7[&a|||||||||||||||&c|||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 2:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 2.5
+			send action bar "&7[&a||||||||||||||||&c||||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 1.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 2
+			send action bar "&7[&a|||||||||||||||||&c|||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 1:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 1.5
+			send action bar "&7[&a||||||||||||||||||&c||&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 0.5:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 1
+			send action bar "&7[&a|||||||||||||||||||&c|&7]" to loop-player
+		if {PvPTagCooldown::%{S}%::%loop-player's uuid%} is 0:
+			set {PvPTagCooldown::%{S}%::%loop-player's uuid%} to 0.5
+			send action bar "&7[&a||||||||||||||||||||&7]" to loop-player
+
+on break:
+	event-block is emerald ore
+	clear drops
+	drop 15 xp at event-block
+
+on bucket empty:
+	event-world is world({config::world})
+	send "&cYou can't place water buckets!"
+	cancel event
+
+on quit:
+	if {PvPTag::%{S}%::%player's uuid%} is true:
+		kill player
+
+on swap hand items:
+	event-world is world({config::world})
+	send "&cPlease manually move this item in your inventory."
+	cancel event
+
+on command:
+	executor is player
+	if command is "me" or "minecraft:me":
+		cancel event
+		send "&cYou are not allowed to do this!"
+
+on dispense:
+	event-item is water bucket
+	cancel event
+
+on death:
+	if {god::%player's uuid%} is true:
+		cancel event
+	else:
+		add 1 to {Deaths::%{S}%::%player's uuid%}
+		victim is a player
+		if damage cause is fall:
+			broadcast "&4☠ &c%Victim% &aJust died from &6Fall Damage"
+		attacker is a player
+		add 1 to {Kills::%{S}%::%player's uuid%}
+		set {_n} to name of attacker's held item
+		if {_n} is set:
+			broadcast "&4☠ &c%Victim% &aJust got killed by &6%attacker% &awith &b%{_n}%"
+		else:
+			broadcast "&4☠ &c%Victim% &aJust got killed by &6%attacker%"
+
+on join:
+	set {Nickname::%player's uuid%} to "%player%"
+	teleport player to {spawn::%{S}%}
+	if {Joins::*} does not contain player's uuid:
+		set {playerdata::%player's uuid%::firstjoin} to unix timestamp of now
+		set the join message to "%player's prefix%%{Nickname::%player's uuid%}%&6 has joined the game for the first time. Please welcome them."
+		add player's uuid to {Joins::*}
+	else:
+		add unix timestamp of now to {playerdata::%player's uuid%::joins::*}
+		set the join message to "&8[&a+&8] %player's prefix%%{Nickname::%player's uuid%}%"
+	if {sjoins::%{S}%::*} does not contain player's uuid:
+		add player's uuid to {sjoins::%{S}%::*}
+		giveWelcomeBook(player, true)
+
+function giveWelcomeBook(p: player, firstJoin: boolean):
+	set {_i} to a written book
+	if {_firstJoin} is true:
+		set book author of {_i} to "Prodeathmaster"
+	else:
+		set book author of {_i} to {_p}'s name
+	set book title of {_i} to "Welcome %{_p}'s name%"
+	set {_page::1} to text component of "Welcome to Hiant %{_p}'s name%. We are an advanced and fun box server on Minehut. We strive to give our community nothing but the best. Have fun and enjoy your stay.%newline%%newline%From, Prodeathmaster%newline%"
+	set {_page::2} to text component of "Links: "
+	set {_page::3} to text component of "Discord"
+	set click event of {_page::3} to a new click event to open url "https://discord.gg/D6kPVwqEM8"
+	set hover event of {_page::3} to a new hover event showing "Click to navigate to discord"
+	set {_page::4} to text component of " - "
+	set {_page::5} to text component of "Store"
+	set click event of {_page::5} to a new click event to open url "https://hiant.tebex.io"
+	set hover event of {_page::5} to a new hover event showing "Click to navigate to store"
+	set page 1 of book {_i} to {_page::*}
+	give {_p} 1 of {_i}

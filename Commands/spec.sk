@@ -1,0 +1,10 @@
+command spec:
+	permission: skript.spec
+	permission message: &cThis is a moderator only command
+	trigger:
+		if player's gamemode is spectator:
+			set player's gamemode to survival
+			send "&e&lSPEC &8| &aSet your gamemode to survival"
+		else:
+			set player's gamemode to spectator
+			send "&e&lSPEC &8| &aSet your gamemode to spectator"

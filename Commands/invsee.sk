@@ -1,0 +1,11 @@
+options:
+	prefix: &e&lINVSEE &8|
+
+command /invsee [<offlineplayer>]:
+	permission: staff.invsee
+	executable by: players
+	trigger:
+		if arg is not set:
+			send "{@prefix} &aPlease set an argument in argument 1"
+			stop
+		open inventory of arg to player

@@ -1,0 +1,5 @@
+command clearmychat:
+	trigger:
+		loop 300 times:
+			send " "
+		send "&a&lCLEARMYCHAT &8| &eCleared your chat"

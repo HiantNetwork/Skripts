@@ -1,0 +1,214 @@
+on load:
+	enchants_setVariables1()
+	enchants_setVariables2()
+
+function enchants_setVariables2():
+	set {enchants::categories::*} to "sword", "armor", "bow", "crossbow", "axe", "pickaxe", "shovel", "hoe", "trident" and "enchantedbook"
+	
+	set {enchants::category::sword::items::*} to netherite sword, diamond sword, gold sword, iron sword, stone sword and wood sword
+	set {enchants::category::armor::items::*} to leather cap, leather tunic, leather pants, leather boots, chainmail helmet, chainmail chestplate, chainmail leggings, chainmail boots, iron helmet, iron chestplate, iron leggings, iron boots, gold helmet, gold chestplate, gold leggings, gold boots, diamond helmet, diamond chestplate, diamond leggings, diamond boots, netherite helmet, netherite chestplate, netherite leggings and netherite boots
+	set {enchants::category::bow::items::*} to bow
+	set {enchants::category::crossbow::items::*} to crossbow
+	set {enchants::category::axe::items::*} to netherite axe, diamond axe, gold axe, iron axe, stone axe and wood axe
+	set {enchants::category::pickaxe::items::*} to netherite pickaxe, diamond pickaxe, gold pickaxe, iron pickaxe, stone pickaxe and wood pickaxe
+	set {enchants::category::shovel::items::*} to netherite shovel, diamond shovel, gold shovel, iron shovel, stone shovel and wood shovel
+	set {enchants::category::hoe::items::*} to netherite hoe, diamond hoe, gold hoe, iron hoe, stone hoe and wood hoe
+	set {enchants::category::trident::items::*} to trident
+	set {enchants::category::enchantedbook::items::*} to book
+
+	set {enchants::category::sword::enchants::*} to unbreaking, mending, curse of vanishing, sharpness, fire aspect, mending, knockback, sweeping edge, efficiency, smite, curse of vanishing, smite and unbreaking
+	set {enchants::category::armor::enchants::*} to unbreaking, mending, curse of vanishing, blast protection, curse of binding, feather falling, fire protection, projectile protection, protection, soul speed and thorns
+	set {enchants::category::bow::enchants::*} to unbreaking, mending, curse of vanishing, flame, infinity, power and punch 
+	set {enchants::category::crossbow::enchants::*} to unbreaking, mending, curse of vanishing, flame, infinity, power, punch, multishot, piercing and quick charge
+	set {enchants::category::axe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency, silk touch and sharpness
+	set {enchants::category::pickaxe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency, fortune and silk touch
+	set {enchants::category::shovel::enchants::*} to unbreaking, mending, curse of vanishing, efficiency and silk touch
+	set {enchants::category::hoe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency and silk touch
+	set {enchants::category::trident::enchants::*} to unbreaking, mending, curse of vanishing, impaling, loyalty, riptide and piercing
+	set {enchants::category::enchantedbook::enchants::*} to (indexes of {enchants::list::*} parsed as enchantment types)
+
+function enchants_setVariables1():
+    #Sharpness
+	set {enchants::list::sharpness::max} to 5
+	set {enchants::list::sharpness::start} to 5
+	set {enchants::list::sharpness::increase} to 10
+
+	#Unbreaking
+	set {enchants::list::unbreaking::max} to 3
+	set {enchants::list::unbreaking::start} to 10
+	set {enchants::list::unbreaking::increase} to 10
+
+	#Mending
+	set {enchants::list::mending::max} to 1
+	set {enchants::list::mending::start} to 30
+	set {enchants::list::mending::increase} to 0
+
+	#Fire Aspect
+	set {enchants::list::fireaspect::max} to 2
+	set {enchants::list::fireaspect::start} to 15
+	set {enchants::list::fireaspect::increase} to 15
+
+	#Knockback
+	set {enchants::list::knockback::max} to 2
+	set {enchants::list::knockback::start} to 15
+	set {enchants::list::knockback::increase} to 15
+
+	#Sweeping Edge
+	set {enchants::list::sweepingedge::max} to 3
+	set {enchants::list::sweepingedge::start} to 10
+	set {enchants::list::sweepingedge::increase} to 10
+
+	#Efficiency
+	set {enchants::list::efficiency::max} to 5
+	set {enchants::list::efficiency::start} to 5
+	set {enchants::list::efficiency::increase} to 10
+
+	#Smite
+	set {enchants::list::smite::max} to 3
+	set {enchants::list::smite::start} to 10
+	set {enchants::list::smite::increase} to 10
+
+	#Curse of Vanishing
+	set {enchants::list::curseofvanishing::max} to 1
+	set {enchants::list::curseofvanishing::start} to 30
+	set {enchants::list::curseofvanishing::increase} to 0
+
+	#Aqua Affinity
+	set {enchants::list::aquaaffinity::max} to 1
+	set {enchants::list::aquaaffinity::start} to 20
+	set {enchants::list::aquaaffinity::increase} to 0
+
+	#Blast Protection
+	set {enchants::list::blastprotection::max} to 4
+	set {enchants::list::blastprotection::start} to 5
+	set {enchants::list::blastprotection::increase} to 10
+
+	#Curse of Binding
+	set {enchants::list::curseofbinding::max} to 1
+	set {enchants::list::curseofbinding::start} to 30
+	set {enchants::list::curseofbinding::increase} to 0
+
+	#Depth Strider
+	set {enchants::list::depthstrider::max} to 3
+	set {enchants::list::depthstrider::start} to 5
+	set {enchants::list::depthstrider::increase} to 10
+
+	#Feather Falling
+	set {enchants::list::featherfalling::max} to 4
+	set {enchants::list::featherfalling::start} to 10
+	set {enchants::list::featherfalling::increase} to 5
+
+	#Fire Protection
+	set {enchants::list::fireprotection::max} to 4
+	set {enchants::list::fireprotection::start} to 5
+	set {enchants::list::fireprotection::increase} to 10
+
+	#Frost Walker
+	set {enchants::list::frostwalker::max} to 2
+	set {enchants::list::frostwalker::start} to 10
+	set {enchants::list::frostwalker::increase} to 10
+
+	#Projectile Protection
+	set {enchants::list::projectileprotection::max} to 4
+	set {enchants::list::projectileprotection::start} to 5
+	set {enchants::list::projectileprotection::increase} to 10
+
+	#Protection
+	set {enchants::list::protection::max} to 4
+	set {enchants::list::protection::start} to 5
+	set {enchants::list::protection::increase} to 10
+
+	#Respiration
+	set {enchants::list::respiration::max} to 3
+	set {enchants::list::respiration::start} to 10
+	set {enchants::list::respiration::increase} to 5
+
+	#Soul Speed
+	set {enchants::list::soulspeed::max} to 3
+	set {enchants::list::soulspeed::start} to 10
+	set {enchants::list::soulspeed::increase} to 5
+
+	#Thorns
+	set {enchants::list::thorns::max} to 3
+	set {enchants::list::thorns::start} to 10
+	set {enchants::list::thorns::increase} to 10
+
+	#Channeling
+	set {enchants::list::channeling::max} to 1
+	set {enchants::list::channeling::start} to 20
+	set {enchants::list::channeling::increase} to 0
+
+	#Looting
+	set {enchants::list::looting::max} to 3
+	set {enchants::list::looting::start} to 15
+	set {enchants::list::looting::increase} to 5
+
+	#Impaling
+	set {enchants::list::impaling::max} to 5
+	set {enchants::list::impaling::start} to 5
+	set {enchants::list::imapling::increase} to 10
+
+	#Infinity
+	set {enchants::list::infinity::max} to 1
+	set {enchants::list::infinity::start} to 20
+	set {enchants::list::infinity::increase} to 0
+
+	#Loyalty
+	set {enchants::list::loyalty::max} to 3
+	set {enchants::list::loyalty::start} to 10
+	set {enchants::list::loyalty::increase} to 10
+
+	#Riptide
+	set {enchants::list::riptide::max} to 3
+	set {enchants::list::riptide::start} to 10
+	set {enchants::list::riptide::increase} to 10
+
+	#Multishot
+	set {enchants::list::multishot::max} to 1
+	set {enchants::list::multishot::start} to 30
+	set {enchants::list::multishot::increase} to 0
+
+	#Piercing
+	set {enchants::list::piercing::max} to 4
+	set {enchants::list::piercing::start} to 5
+	set {enchants::list::piercing::increase} to 10
+
+	#Power
+	set {enchants::list::power::max} to 5
+	set {enchants::list::power::start} to 5
+	set {enchants::list::power::increase} to 10
+
+	#Punch
+	set {enchants::list::punch::max} to 2
+	set {enchants::list::punch::start} to 10
+	set {enchants::list::punch::increase} to 10
+
+	#Quick Charge
+	set {enchants::list::quickcharge::max} to 3
+	set {enchants::list::quickcharge::start} to 5
+	set {enchants::list::quickcharge::increase} to 10
+
+	#Fortune
+	set {enchants::list::fortune::max} to 3
+	set {enchants::list::fortune::start} to 10
+	set {enchants::list::fortune::increase} to 10
+
+	#Luck of the Sea
+	set {enchants::list::luckofthesea::max} to 3
+	set {enchants::list::luckofthesea::start} to 5
+	set {enchants::list::luckofthesea::increase} to 10
+
+	#Lure
+	set {enchants::list::lure::max} to 3
+	set {enchants::list::lure::start} to 5
+	set {enchants::list::lure::increase} to 10
+
+	#Silk Touch
+	set {enchants::list::silktouch::max} to 1
+	set {enchants::list::silktouch::start} to 30
+	set {enchants::list::silktouch::increase} to 0
+
+	#Bane of Arthropods
+	set {enchants::list::baneofarthropods::max} to 5
+	set {enchants::list::baneofarthropods::start} to 5
+	set {enchants::list::baneofarthropods::increase} to 10

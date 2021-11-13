@@ -1,0 +1,12 @@
+command nickname [<text>]:
+	aliases: nick
+	permission: skript.chat.nick
+	permission message: &cThis command is a &c&lDonator&c only perk!
+	trigger:
+		if arg-1 isn't set:
+			send "&cYou can't be named nothing! Your nickname must include an argument." to player
+			stop
+		if the length of uncolored arg-1 is greater than 16:
+			send "&cThat nickname is &c&ltoo&c long! Try again with a shorter nickname." to player
+			stop
+		set {Nickname::%player's uuid%} to colored arg

@@ -1,0 +1,293 @@
+options:
+  p: &6&lSkriptEditor &8|
+
+on load:
+  set {SkriptEditor::Blank} to ""
+  loop 100 times:
+    set {SkriptEditor::Blank} to "%{SkriptEditor::Blank}%%newline%"
+
+command /skripteditor [<text>] [<text>] [<text>]:
+  aliases: /skeditor, /editor, /skript-editor
+  trigger:
+    if player is op:
+      openSkriptEditor(player)
+    else:
+      send "{@p} &cYou do not have access to the SkriptEditor."
+
+function openSkriptEditor(p: player):
+  set {_u} to {_p}'s uuid
+  set metadata tag "skript-editor" of {_p} to chest inventory named "{@p} &7Skript Panel" with 6 rows
+  set {_inv} to metadata tag "skript-editor" of {_p}
+  set {SkriptEditorGUI::users::%{_u}%::page} to 1
+  set {_query::*} to split {SkriptEditorGUI::users::%{_u}%::filter} at ":"
+  delete {_query::1}
+  set {_query} to join {_query::*} with ":"
+  delete {SkriptEditorGUI::users::%{_u}%::scripts::*}
+  if {SkriptEditorGUI::users::%{_u}%::filter} is "all":
+    set {_scripts::*} to all scripts where [input does not contain script]
+  else if {SkriptEditorGUI::users::%{_u}%::filter} is "enabled":
+    set {_scripts::*} to all enabled scripts where [input does not contain script]
+  else if {SkriptEditorGUI::users::%{_u}%::filter} is "disabled":
+    set {_scripts::*} to all disabled scripts
+  else if first element out of (split {SkriptEditorGUI::users::%{_u}%::filter} at ":") is "search":
+    set {_scripts::*} to all scripts where [input does not contain script]
+    loop {_scripts::*}:
+      if loop-value contains {_query}:
+        add loop-value to {_s::*}
+    set {_scripts::*} to {_s::*}
+    if {_s::*} is not set:
+      delete {_scripts::*}
+  set {_si} to 0
+  loop {_scripts::*}:
+    add "%{_si}%:%loop-value%" to {SkriptEditorGUI::users::%{_u}%::scripts::*}
+    add 1 to {_si}
+  delete {_i}
+  set {_pageIndex} to {SkriptEditorGUI::users::%{_u}%::page} * 36
+  if {_scripts::*} is set:
+    set {_i} to {_pageIndex} - 36
+    loop 36 times:
+      add 1 to {_i}
+      add {_scripts::%{_i}%} to {_files::*}
+      if {_i} is size of {_scripts::*}:
+        stop loop
+      if {_pageIndex} is {_i}:
+        stop loop
+    set {_i} to 0
+    loop {_files::*}:
+      #●
+      set {_l} to loop-value
+      replace all "\" in {_l} with "/"
+      if first character of last element out of (split {_l} at "/") is "-":
+        delete {_t}
+        # [START]
+        set {_sSize} to size of split {_l} at "/"
+        set {_s::*} to split {_l} at "/"
+        set {_s::%{_sSize}%} to last (length of {_s::%{_sSize}%} - 1) characters of {_s::%{_sSize}%}
+        set {_l} to join {_s::*} with "/"
+        # [END]
+        set {_t} to {SkriptEditorGUI::users::%{_u}%::script}
+        replace all "\" in {_t} with "/"
+        delete {_s::*}
+        delete {_sSize}
+        # [START]
+        set {_sSize} to size of split {_t} at "/"
+        set {_s::*} to split {_t} at "/"
+        set {_s::%{_sSize}%} to last (length of {_s::%{_sSize}%} - 1) characters of {_s::%{_sSize}%}
+        set {_t} to join {_s::*} with "/"
+        # [END]
+        if {_l} is {_t}:
+          set slot {_i} of {_inv} to glowing paper named "&4● &7%{_l}%"
+        else:
+          set slot {_i} of {_inv} to paper named "&4● &7%{_l}%"
+      else:
+        if {_l} is {SkriptEditorGUI::users::%{_u}%::script}:
+          set slot {_i} of {_inv} to glowing paper named "&2● &7%{_l}%"
+        else:
+          set slot {_i} of {_inv} to paper named "&2● &7%{_l}%"
+      add 1 to {_i}
+  else:
+    set slot 0 of {_inv} to barrier named "&cNo scripts" with lore "" and "&7No scripts other than this one."
+  if {SkriptEditorGUI::users::%{_u}%::filter} is "all":
+    set slot 47 of {_inv} to book named "&6Filter" with lore "", "&a&lAll", "&eEnabled" and "&cDisabled"
+  else if {SkriptEditorGUI::users::%{_u}%::filter} is "enabled":
+    set slot 47 of {_inv} to book named "&6Filter" with lore "", "&aAll", "&e&lEnabled" and "&cDisabled"
+  else if {SkriptEditorGUI::users::%{_u}%::filter} is "disabled":
+    set slot 47 of {_inv} to book named "&6Filter" with lore "", "&aAll", "&eEnabled" and "&c&lDisabled"
+  else if first element out of (split {SkriptEditorGUI::users::%{_u}%::filter} at ":") is "search":
+    set slot 47 of {_inv} to book named "&6Filter" with lore "", "&7Searching. Click to cancel query." and "&8Query: &7%{_query}%"
+  set slot 46 of {_inv} to orange glass named "&6&lReload Skript" with lore "", "&6[Left Click] &7Reloads skript. This includes %script%&7.sk.", "&7 May cause damage to the GUI.", "", "&6[Right Click] &7Reloads Skript aliases.", "" and "&6[Middle Click] &7Reloads Skript config."
+  if {SkriptEditorGUI::users::%{_u}%::script} is set:
+    set {_s} to {SkriptEditorGUI::users::%{_u}%::script}
+    replace all "\" in {_s} with "/"
+    if first character of (last element out of (split {_s} at "/")) is "-":
+      # [START]
+      set {_sSize} to size of split {_s} at "/"
+      set {_s::*} to split {_s} at "/"
+      set {_s::%{_sSize}%} to last (length of {_s::%{_sSize}%} - 1) characters of {_s::%{_sSize}%}
+      set {_s} to join {_s::*} with "/"
+      # [END]
+      set {_s} to "&4● &7%{_s}%"
+    else:
+      set {_s} to "&2● &7%{_s}%"
+    if length of {_s} is more than 24:
+      set {_svisual} to "%first 32 characters of {_s}%..."
+    else:
+      set {_svisual} to {_s}
+    if first 3 characters of {_s} is formatted "&4●":
+      set slot 48 of {_inv} to yellow concrete named "&eReload" with lore "", "&7Reloads the selected script.", "&7Can reload: &cFalse" and "&6Script: &7%{_svisual}%"
+      set slot 49 of {_inv} to green concrete named "&aEnable" with lore "", "&7Enables the selected script.", "&7Can enable: &aTrue" and "&6Script: &7%{_svisual}%"
+      set slot 50 of {_inv} to red concrete named "&cDisable" with lore "", "&7Disables the selected script.", "&7Can disable: &cFalse" and "&6Script: &7%{_svisual}%"
+    else:
+      set slot 48 of {_inv} to yellow concrete named "&eReload" with lore "", "&7Reloads the selected script.", "&7Can reload: &aTrue" and "&6Script: &7%{_svisual}%"
+      set slot 49 of {_inv} to green concrete named "&aEnable" with lore "", "&7Enables the selected script.", "&7Can enable: &cFalse" and "&6Script: &7%{_svisual}%"
+      set slot 50 of {_inv} to red concrete named "&cDisable" with lore "", "&7Disables the selected script.", "&7Can disable: &aTrue" and "&6Script: &7%{_svisual}%"
+  else:
+    set slot 48 of {_inv} to yellow concrete named "&e&lReload All" with lore "" and "&7Reloads all of the enabled shown scripts."
+    set slot 49 of {_inv} to green concrete named "&a&lEnable All" with lore "" and "&7Enables all of the disabled shown scripts."
+    set slot 50 of {_inv} to red concrete named "&c&lDisable All" with lore "" and "&7Disables all of the enabled shown scripts."
+  set slot 51 of {_inv} to anvil named "&6Search" with lore "" and "&7Create a search query."
+  set slot 36,37,38,39,40,41,42,43 and 44 of {_inv} to gray stained glass pane named "&7"
+  set {_skull} to player skull with nbt "{display:{Name:""{\""text\"":\""Gray Arrow Left\""}""},SkullOwner:{Id:[I;-1620035141,-2078061139,-2011351746,470021397],Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19""}]}}}"
+  set slot 45 of {_inv} to {_skull} named "&6Last Page" with lore "" and "&7Go to the last page."
+  set {_skull} to player skull with nbt "{display:{Name:""{\""text\"":\""Gray Arrow Right\""}""},SkullOwner:{Id:[I;1917395862,-1007137920,-1567882985,-73443056],Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0=""}]}}}"
+  set slot 53 of {_inv} to {_skull} named "&6Next Page" with lore "" and "&7Go to the next page."
+  open {_inv} to {_p}
+
+on inventory click:
+  if event-inventory is (metadata tag "skript-editor" of player):
+    cancel event
+    loop {SkriptEditorGUI::users::%player's uuid%::scripts::*}:
+      set {_i} to first element out of (split loop-value at ":")
+      set {_d::*} to split loop-value at ":"
+      delete {_d::1}
+      set {_s} to join {_d::*} with ":"
+      if index of event-slot is {_i} parsed as a number:
+        if {SkriptEditorGUI::users::%player's uuid%::script} is not "%{_s}%":
+          set {SkriptEditorGUI::users::%player's uuid%::script} to "%{_s}%"
+          openSkriptEditor(player)
+          stop loop
+        else:
+          delete {SkriptEditorGUI::users::%player's uuid%::script}
+          openSkriptEditor(player)
+          stop loop
+    delete {_s}
+    delete {_d::*}
+    delete {_i}
+    if index of event-slot is 45:
+      {SkriptEditorGUI::users::%player's uuid%::page} - 1 is not 0
+      remove 1 from {SkriptEditorGUI::users::%player's uuid%::page}
+      openSkriptEditor(player)
+    else if index of event-slot is 46:
+      if click type is left mouse button:
+        close player's inventory
+        send "{@p} &7Reloading Skript."
+        set {_now} to now
+        execute console command "sk reload all"
+        send "{@p} &7Reloaded Skript! (&e%difference between {_now} and now%&7)"
+        openSkriptEditor(player)
+      else if click type is right mouse button:
+        close player's inventory
+        send "{@p} &7Reloading Skript aliases."
+        set {_now} to now
+        execute console command "sk reload aliases"
+        send "{@p} &7Reloaded Skript aliases! (&e%difference between {_now} and now%&7)"
+        openSkriptEditor(player)
+      else if click type is middle mouse button:
+        send "{@p} &7Reloading Skript config."
+        set {_now} to now
+        execute console command "sk reload config"
+        send "{@p} &7Reloaded Skript config! (&e%difference between {_now} and now%&7)"
+        openSkriptEditor(player)
+    else if index of event-slot is 48:
+      if {SkriptEditorGUI::users::%player's uuid%::script} is set:
+        set {_s} to {SkriptEditorGUI::users::%player's uuid%::script}
+        replace all "\" in {_s} with "/"
+        first character of (last element out of (split {_s} at "/")) is not "-"
+        send "{@p} &7Reloading &2● &7%{_s}%&7."
+        set {_now} to now
+        reload script "%{_s}%"
+        send "{@p} &7Reloaded &2● &7%{_s}%&7! (&e%difference between {_now} and now%&7)"
+      else:
+        send "{@p} &7Reloading all seen scripts."
+        set {_now} to now
+        loop {SkriptEditorGUI::users::%player's uuid%::scripts::*}:
+          set {_i} to first element out of (split loop-value at ":")
+          set {_d::*} to split loop-value at ":"
+          delete {_d::1}
+          set {_s} to join {_d::*} with ":"
+          replace all "\" in {_s} with "/"
+          first character of (last element out of (split {_s} at "/")) is not "-"
+          reload script "%{_s}%"
+        send "{@p} &7Reloaded all seen scripts! (&e%difference between {_now} and now%)"
+    else if index of event-slot is 49:
+      if {SkriptEditorGUI::users::%player's uuid%::script} is set:
+        set {_s} to {SkriptEditorGUI::users::%player's uuid%::script}
+        replace all "\" in {_s} with "/"
+        first character of (last element out of (split {_s} at "/")) is "-"
+        # [START]
+        set {_sSize} to size of split {_s} at "/"
+        set {_s::*} to split {_s} at "/"
+        set {_s::%{_sSize}%} to last (length of {_s::%{_sSize}%} - 1) characters of {_s::%{_sSize}%}
+        set {_g} to join {_s::*} with "/"
+        # [END]
+        send "{@p} &7Enabling &4● &7%{_g}%&7."
+        set {_now} to now
+        enable script "%{_s}%"
+        send "{@p} &7Enabled &4● &7%{_g}%&7! (&e%difference between {_now} and now%&7)"
+        set {SkriptEditorGUI::users::%player's uuid%::script} to {_g}
+      else:
+        send "{@p} &7Enabling all seen scripts."
+        set {_now} to now
+        loop {SkriptEditorGUI::users::%player's uuid%::scripts::*}:
+          set {_i} to first element out of (split loop-value at ":")
+          set {_d::*} to split loop-value at ":"
+          delete {_d::1}
+          set {_s} to join {_d::*} with ":"
+          replace all "\" in {_s} with "/"
+          first character of (last element out of (split {_s} at "/")) is "-"
+          enable script "%{_s}%"
+        send "{@p} &7Enabled all seen scripts! (&e%difference between {_now} and now%)"
+      openSkriptEditor(player)
+    else if index of event-slot is 50:
+      if {SkriptEditorGUI::users::%player's uuid%::script} is set:
+        set {_s} to {SkriptEditorGUI::users::%player's uuid%::script}
+        replace all "\" in {_s} with "/"
+        first character of (last element out of (split {_s} at "/")) is not "-"
+        send "{@p} &7Disabling &2● &7%{_s}%&7."
+        set {_now} to now
+        disable script "%{_s}%"
+        send "{@p} &7Disabled &2● &7%{_s}%&7! (&e%difference between {_now} and now%&7)"
+        set {_s::*} to split {_s} at "/"
+        set {_ssize} to size of {_s::*}
+        set {_s::%{_ssize}%} to "-%{_s::%{_ssize}%}%"
+        set {_s} to join {_s::*} with "/"
+        set {SkriptEditorGUI::users::%player's uuid%::script} to "%{_s}%"
+      else:
+        send "{@p} &7Disabling all seen scripts."
+        set {_now} to now
+        loop {SkriptEditorGUI::users::%player's uuid%::scripts::*}:
+          set {_i} to first element out of (split loop-value at ":")
+          set {_d::*} to split loop-value at ":"
+          delete {_d::1}
+          set {_s} to join {_d::*} with ":"
+          replace all "\" in {_s} with "/"
+          first character of (last element out of (split {_s} at "/")) is not "-"
+          disable script "%{_s}%"
+        send "{@p} &7Disabled all seen scripts! (&e%difference between {_now} and now%)"
+      openSkriptEditor(player)
+    else if index of event-slot is 47:
+      if {SkriptEditorGUI::users::%player's uuid%::filter} is "all":
+        set {SkriptEditorGUI::users::%player's uuid%::filter} to "enabled"
+      else if {SkriptEditorGUI::users::%player's uuid%::filter} is "enabled":
+        set {SkriptEditorGUI::users::%player's uuid%::filter} to "disabled"
+      else if {SkriptEditorGUI::users::%player's uuid%::filter} is "disabled":
+        set {SkriptEditorGUI::users::%player's uuid%::filter} to "all"
+      else if {SkriptEditorGUI::users::%player's uuid%::filter} is not "all", "enabled" or "disabled":
+        set {SkriptEditorGUI::users::%player's uuid%::filter} to "all"
+        openSkriptEditor(player)
+      openSkriptEditor(player)
+    else if index of event-slot is 51:
+      set {SkriptEditorGUI::users::%player's uuid%::chatInput} to "searchSkript"
+      close player's inventory
+      send formatted "{@p}&cPlease send your search query. Type <tooltip:&7Or click here!><command:[CANCEL]>[CANCEL]<reset>&c to cancel." to player
+    else if index of event-slot is 53:
+      set {_page} to {SkriptEditorGUI::users::%player's uuid%::page} + 1
+      set {_pageIndex} to {_page} * 36
+      set {_i} to {_pageIndex} - 36
+      (size of (all scripts where [input does not contain "%script%.sk"]) + 1) is more than or equal to {_i}
+      add 1 to {SkriptEditorGUI::users::%player's uuid%::page}
+      openSkriptEditor(player)
+
+on quit:
+  delete {SkriptEditorGUI::%player's uuid%::chatInput}
+
+on chat:
+  if {SkriptEditorGUI::users::%player's uuid%::chatInput} is "searchSkript":
+    cancel event
+    if message is "[CANCEL]":
+      send "{@p} &cCancelled the search!"
+      delete {SkriptEditorGUI::%player's uuid%::chatInput}
+    set {SkriptEditorGUI::users::%player's uuid%::filter} to "search:%message%"
+    delete {SkriptEditorGUI::users::%player's uuid%::chatInput}
+    openSkriptEditor(player)
+    send "{@p} &cSearching for ""%message%&c"""

@@ -1,0 +1,57 @@
+command /backpack:
+    permission: skript.backpack
+    usage: &cUsage: /backpack
+    aliases: /bp
+    trigger:
+        if {BackpackLevel::%player's uuid%} is not set:
+            set {BackpackLevel::%player's uuid%} to 1
+        openBackpack(player)
+
+function openBackpack(p: player):
+    set {_u} to {_p}'s uuid
+    set (metadata tag "backpack" of {_p}) to chest inventory with 6 rows named "&6Backpack"
+    set {_inv} to (metadata tag "backpack" of {_p})
+    if {Backpack::%{_u}%::*} is set:
+        set {_i} to 0
+        loop {Backpack::%{_u}%::*}:
+            set slot {_i} of {_inv} to loop-value
+            add 1 to {_i}
+    if {BackpackLevel::%{_u}%} is 1:
+        set slots (all of the integers between 9 to 53) of {_inv} to red stained glass pane named "&c"
+    if {BackpackLevel::%{_u}%} is 2:
+        set slots (all of the integers between 27 to 53) of {_inv} to red stained glass pane named "&c"
+    open {_inv} to {_p}
+
+on inventory click:
+    if (metadata tag "backpack" of player) is event-inventory:
+        event-item is red stained glass pane named "&c"
+        cancel event
+
+on inventory close:
+    if (metadata tag "backpack" of player) is event-inventory:
+        set {_inv} to (metadata tag "backpack" of player)
+        delete {Backpack::%player's uuid%::*}
+        loop slots (integers between 0 to 53) of player's current inventory:
+            loop-value is not red stained glass pane named "&c"
+            add loop-value to {Backpack::%player's uuid%::*}
+
+function backpackLevel(p: player, level: integer):
+    {_level} is 1, 2 or 3
+    set {_u} to {_p}'s uuid
+    set {BackpackLevel::%{_u}%} to {_level}
+
+command /backpack-level <offline player> <integer>:
+    trigger:
+        if player is op:
+            backpackLevel(arg-1, arg-2)
+            send "&aSet %arg-1%&a's backpack level to %arg-2%&a."
+        else:
+            send "&cNo permissions."
+
+command /backpack-clear <offline player>:
+    trigger:
+        if player is op:
+            delete {Backpack::%arg-1's uuid%}
+            send "&aDeleted %arg-1%&a's backpack."
+        else:
+            send "&cNo permissions."

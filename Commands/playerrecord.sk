@@ -1,0 +1,9 @@
+on join:
+    if {playeramountrecord} isn't set:
+        set {playeramountrecord} to amount of players 
+    if {playeramountrecord} < amount of players:
+        set {playeramountrecord} to amount of players
+
+command playerrecord:
+    trigger:
+        send "&aThe player count record is &6%{playeramountrecord}%"

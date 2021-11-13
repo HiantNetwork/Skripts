@@ -1,0 +1,9 @@
+on placeholderapi placeholder request for the prefix "hiant":
+	if the identifier is "kdr":
+		set the result to "%{kills::%{S}%::%player's uuid%}/{deaths::%{S}%::%player's uuid%}%"
+	else if the identifier is "kills":
+		set the result to "%{kills::%{S}%::%player's uuid%}%"
+	else if the identifier is "deaths":
+		set the result to "%{deaths::%{S}%::%player's uuid%}%"
+	else if the identifier is "kisses":
+		set the result to "%{Kiss::%player's uuid%}%"

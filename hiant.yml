@@ -1,0 +1,12 @@
+season: Beta-1
+
+messages:
+    noperms: "&cYou do not have permission for this"
+
+discord:
+    links:
+        mc-channel: 899003636972130416
+    token: Nzk5NzUxMzM4MzkyOTQ0NjYw.YAIIeQ.QgjJGesPK5ppoh3Mbv5VR6TojZU
+
+world: S1
+mongourl: "mongodb://hiant:DbNCquM7Mw2buDH9848K9MJHT6zwWB7rVWNJSau3744xagtVmC@70.188.18.250:3506/?authSource=admin"

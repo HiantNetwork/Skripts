@@ -1,0 +1,21 @@
+options:
+    prefix: &b&lSuedo &8|
+
+command /sudo [<offlineplayer>] [<text>]:
+	permission: skript.suedo
+	trigger:
+        if arg-1 is not set:
+            send "{@prefix} &fPlease set a players name in argument 1"
+            stop
+		{sudowhitelist::*} does not contain arg-1
+		if first character of arg-2 is "/":
+			make arg-1 execute arg-2
+			send "{@prefix} &fForced %arg-1% to execute ""%arg-2%&r"""
+		else:
+			make arg-1 say arg-2
+			send "{@prefix} &fForced %arg-1% to say ""%arg-2%&r"""
+
+on load:
+    set {_players::*} to "Prodeathmaster", "TrueFusion", "CyberedCake", "LukeIThink", "Cocwa"
+    loop {_players::*}:
+        add (loop-value parsed as an offline player) to {sudowhitelist::*}

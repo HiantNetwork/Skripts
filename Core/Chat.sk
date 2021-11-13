@@ -1,0 +1,449 @@
+options:
+	gradient: <##5092FF>Gradient
+	chatcolor: <##5092FF>Color
+	rainbow: <##5092FF>Rainbow
+
+on chat:
+	loop {Filter::*}:
+		if message contains loop-value:
+			cancel event
+			stop trigger
+	
+	if first character of message starts with "##":
+		player has permission "skript.staffchat.use"
+		cancel event
+		stop trigger
+	
+	if player has permission "skript.chat.color":
+		if {chatcolor::%player's uuid%::*} is not set:
+			set {chatcolor::%player's uuid%::*} to 255, 255 and 255
+		set {_m} to gradient(message, {chatcolor::%player's uuid%::*}, {chatcolor::%player's uuid%::*}, -1)
+	if {Rainbowon::%player's uuid%} is true:
+		player has permission "skript.chat.rainbow"
+		set {_m} to rainbow(message, -1, {chatrainbowLight::%player's uuid%})
+	if {gradienton::%player's uuid%} is true:
+		player has permission "skript.chat.gradient"
+		set {_m} to gradient(message, {chatgradient1::%player's uuid%::*}, {chatgradient2::%player's uuid%::*}, -1)
+	if {_m} is not set:
+		set {_m} to "&7%message%"
+	if uncolored player's suffix is not " " or "":
+		if {clans::%{S}%::Users::%player's uuid%::clan} is set:
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% &r%player's suffix% &6[%{clans::%{S}%::Clans::%{clans::%{S}%::Users::%player's uuid%::clan}%::name}%&6] &8» &r%{_m}%"
+		else:
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% &r%player's suffix% &8» &r%{_m}%"
+	else:
+		if {clans::%{S}%::Users::%player's uuid%::clan} is set:
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}%&r &6[%{clans::%{S}%::Clans::%{clans::%{S}%::Users::%player's uuid%::clan}%::name}%&6] &8» &r%{_m}%"
+		else:
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% &8» &r%{_m}%"
+
+function gradient(input: string, startColor: numbers, endColor: numbers, wrapAmount: number = -1) :: string:
+	set {_delta} to 180 / ({_wrapAmount} if {_wrapAmount} > 0, else (length of uncolored {_input}) - 1)
+	set {_angle} to 90
+	loop length of {_input} times:
+		set {_character} to character at loop-value in {_input}
+		if {_character} or (character at (loop-value - 1) in {_input}) is "§":
+			if "abcdefklmnor0123456789" contains {_character}:
+				set {_format} to (join {_format} and "&%{_character}%") if {_character} is not "r", else ("")
+			continue
+		set {_startColorProportion} to (0.5 * (sin({_angle}) + 1))
+		set {_endColorProportion} to (0.5 * (sin({_angle} + 180) + 1))
+		set {_output} to join {_output}, "<##%decimalToHexadecimal(({_startColor::1} * {_startColorProportion}) + ({_endColor::1} * {_endColorProportion}))%%decimalToHexadecimal(({_startColor::2} * {_startColorProportion}) + ({_endColor::2} * {_endColorProportion}))%%decimalToHexadecimal(({_startColor::3} * {_startColorProportion}) + ({_endColor::3} * {_endColorProportion}))%>", {_format} and {_character}
+		add {_delta} to {_angle}
+	return colored {_output}
+
+function rainbow(input: string, wrapAmount: number = -1, lightness: number = 0.5) :: string:
+	set {_delta} to 360 / ({_wrapAmount} if {_wrapAmount} > 0, else length of {_input})
+	set {_lightnessModifier} to (({_lightness}*2)-1) * 255
+	set {_angle} to 90
+	loop length of {_input} times:
+		set {_character} to character at loop-value in {_input}
+		if {_character} or (character at (loop-value - 1) in {_input}) is "§":
+			if "abcdefklmnor0123456789" contains {_character}:
+				set {_format} to (join {_format} and "&%{_character}%") if {_character} is not "r", else ("")
+			continue
+		set {_output} to join {_output}, "<##%decimalToHexadecimal((0.5 * (sin({_angle}) + 1)) * 255 + {_lightnessModifier})%%decimalToHexadecimal((0.5 * (sin({_angle} + 120) + 1)) * 255 + {_lightnessModifier})%%decimalToHexadecimal((0.5 * (sin({_angle} + 240) + 1)) * 255 + {_lightnessModifier})%>", {_format} and {_character}
+		remove {_delta} from {_angle}
+	return colored {_output}
+
+function decimalToHexadecimal(number: number) :: string:
+	return ("00" if {_number} <= 0, else ("FF")) if {_number} is not between 0 and 255
+	return join (character at (mod((floor({_number} / 16)), 16) + 1) in "0123456789ABCDEF") and (character at ((mod({_number}, 16)) + 1) in "0123456789ABCDEF")
+
+# ---------
+
+command /gradient:
+	permission: skript.chat.gradient
+	trigger:
+		set metadata tag "gradient" of player to chest inventory with 3 rows named "{@gradient}"
+		set {_inv} to (metadata tag "gradient" of player)
+		set {_i} to 0
+		loop 26 times:
+			set slot {_i} of {_inv} to red stained glass pane named "&7 "
+			add 1 to {_i}
+		if {gradienton::%player's uuid%} is true:
+			set {_t} to "&cTurn gradient off"
+			set {_t2} to "&aOn"
+		else:
+			set {_t} to "&aTurn gradient on"
+			set {_t2} to "&cOff"
+		set slot 4 and 13 of metadata tag "gradient" of player to black concrete named "&6←Color To Color→"
+		set slot 22 of metadata tag "gradient" of player to nether star named "%{_t}%" with lore "&7Click to change status"
+		set slot 0 of {_inv} to red wool named "&cRed"
+		set slot 5 of {_inv} to red wool named "&cRed"
+		set slot 1 of {_inv} to blue wool named "&9Blue"
+		set slot 6 of {_inv} to blue wool named "&9Blue"
+		set slot 2 of {_inv} to light green wool named "&aLight Green"
+		set slot 7 of {_inv} to light green wool named "&aLight Green"
+		set slot 3 of {_inv} to green wool named "&2Dark Green"
+		set slot 8 of {_inv} to green wool named "&2Dark Green"
+		set slot 9 of {_inv} to pink wool named "&dPink"
+		set slot 14 of {_inv} to pink wool named "&dPink"
+		set slot 10 of {_inv} to purple wool named "&5Purple"
+		set slot 15 of {_inv} to purple wool named "&5Purple"
+		set slot 11 of {_inv} to yellow wool named "&eYellow"
+		set slot 16 of {_inv} to yellow wool named "&eYellow"
+		set slot 12 of {_inv} to light blue wool named "&bLight Blue"
+		set slot 17 of {_inv} to light blue wool named "&bLight Blue"
+		set slot 18 of {_inv} to white wool named "&fWhite"
+		set slot 23 of {_inv} to white wool named "&fWhite"
+		set slot 19 of {_inv} to black wool named "&0Black"
+		set slot 24 of {_inv} to black wool named "&0Black"
+		set slot 20 of {_inv} to gray wool named "&8Gray"
+		set slot 25 of {_inv} to gray wool named "&8Gray"
+		set slot 21 of {_inv} to orange wool named "&6Gold"
+		set slot 26 of {_inv} to orange wool named "&6Gold"
+		open {_inv} to player
+
+command chatcolor:
+	permission: skript.chat.color 
+	trigger:
+		set metadata tag "chatcolor" of player to chest inventory with 2 rows named "{@chatcolor}"
+		set {_inv} to (metadata tag "chatcolor" of player)
+		set {_i} to 0
+		loop 18 times:
+			set slot {_i} of {_inv} to red stained glass pane named ""
+			add 1 to {_i}
+		set slot 0 of {_inv} to white wool named "&fWhite Chat Color"
+		set slot 1 of {_inv} to black wool named "&0Black Chat Color"
+		set slot 2 of {_inv} to blue wool named "&1Dark Blue Chat Color"
+		set slot 3 of {_inv} to green wool named "&2Dark Green Chat Color"
+		set slot 4 of {_inv} to cyan wool named "&3Dark Aqua Chat Color"
+		set slot 5 of {_inv} to red wool named "&4Dark Red Chat Color"
+		set slot 6 of {_inv} to purple wool named "&5Dark Purple Chat Color"
+		set slot 7 of {_inv} to orange wool named "&6Gold Chat Color"
+		set slot 8 of {_inv} to light gray wool named "&7Light Gray Chat Color"
+		set slot 9 of {_inv} to gray wool named "&8Dark Gray Chat Color"
+		set slot 10 of {_inv} to light blue wool named "&9Blue Chat Color"
+		set slot 11 of {_inv} to light green wool named "&aGreen Chat Color"
+		set slot 12 of {_inv} to light blue wool named "&bAqua Chat Color"
+		set slot 13 of {_inv} to red wool named "&cRed Chat Color"
+		set slot 14 of {_inv} to magenta wool named "&dPink Chat Color"
+		set slot 15 of {_inv} to yellow wool named "&eYellow Chat Color"
+		open {_inv} to player
+
+command rainbow:
+	permission: skript.chat.rainbow
+	trigger:
+		set metadata tag "rainbow" of player to chest inventory with 2 rows named "{@rainbow}"
+		set {_inv} to (metadata tag "rainbow" of player)
+		set {_i} to 0
+		loop 18 times:
+			set slot {_i} of {_inv} to red stained glass pane named ""
+			add 1 to {_i}
+		if {rainbowon::%player's uuid%} is true:
+			set {_t} to "&cTurn Rainbow Off"
+		else:
+			set {_t} to "&aTurn Rainbow On"
+		set slot 13 of {_inv} to nether star named "%{_t}%" with lore "&7Click to change status"
+
+		set slot 2 of {_inv} to nametag named "&eBrightness: &a0.3"
+		set slot 3 of {_inv} to nametag named "&eBrightness: &a0.4"
+		set slot 4 of {_inv} to nametag named "&eBrightness: &a0.5"
+		set slot 5 of {_inv} to nametag named "&eBrightness: &a0.6"
+		set slot 6 of {_inv} to nametag named "&eBrightness: &a0.7"
+		if {chatrainbowLight::%player's uuid%} is 0.3:
+			set slot 2 of {_inv} to nametag of mending 1 named "&eBrightness: &a0.3"
+		else if {chatrainbowLight::%player's uuid%} is 0.4:
+			set slot 3 of {_inv} to nametag of mending 1 named "&eBrightness: &a0.4"
+		else if {chatrainbowLight::%player's uuid%} is 0.5:
+			set slot 4 of {_inv} to nametag of mending 1 named "&eBrightness: &a0.5"
+		else if {chatrainbowLight::%player's uuid%} is 0.6:
+			set slot 5 of {_inv} to nametag of mending 1 named "&eBrightness: &a0.6"
+		else if {chatrainbowLight::%player's uuid%} is 0.7:
+			set slot 6 of {_inv} to nametag of mending 1 named "&eBrightness: &a0.7"
+		open {_inv} to player
+
+# --------------------
+
+on inventory click:
+	if event-inventory is (metadata tag "chatcolor" of player):
+		cancel event
+		if index of event-slot is 0:
+			set {chatcolor::%player's uuid%::*} to 255, 255 and 255
+		if index of event-slot is 1:
+			set {chatcolor::%player's uuid%::*} to 0, 0 and 0
+		if index of event-slot is 2:
+			set {chatcolor::%player's uuid%::*} to 0, 0 and 170
+		if index of event-slot is 3:
+			set {chatcolor::%player's uuid%::*} to 0, 170 and 0
+		if index of event-slot is 4:
+			set {chatcolor::%player's uuid%::*} to 0, 170 and 170
+		if index of event-slot is 5:
+			set {chatcolor::%player's uuid%::*} to 170, 0 and 0
+		if index of event-slot is 6:	
+			set {chatcolor::%player's uuid%::*} to 170, 0 and 170
+		if index of event-slot is 7:
+			set {chatcolor::%player's uuid%::*} to 255, 170 and 0
+		if index of event-slot is 8:
+			set {chatcolor::%player's uuid%::*} to 170, 170 and 170
+		if index of event-slot is 9:
+			set {chatcolor::%player's uuid%::*} to 85, 85 and 85
+		if index of event-slot is 10:
+			set {chatcolor::%player's uuid%::*} to 85, 85 and 255
+		if index of event-slot is 11:
+			set {chatcolor::%player's uuid%::*} to 85, 255 and 85
+		if index of event-slot is 12:
+			set {chatcolor::%player's uuid%::*} to 85, 255 and 255
+		if index of event-slot is 13:
+			set {chatcolor::%player's uuid%::*} to 255, 85 and 85
+		if index of event-slot is 14:	
+			set {chatcolor::%player's uuid%::*} to 255, 85 and 255
+		if index of event-slot is 15:
+			set {chatcolor::%player's uuid%::*} to 255, 255 and 85
+		if index of event-slot is not 16 or 17:
+			set {gradienton::%player's uuid%} to false
+			set {rainbowon::%player's uuid%} to false
+			close player's inventory
+
+on inventory click:
+	if event-inventory is (metadata tag "gradient" of player):
+		cancel event
+		if index of event-slot is 22:
+			if {gradienton::%player's uuid%} is true:
+				set {gradienton::%player's uuid%} to false
+				send "{@gradient} &8| &cTurned Gradient Chat Effect Off"
+				set slot 22 of metadata tag "gradient" of player to nether star named "&cTurn Gradient Off" with lore "&7Click to change status"
+				open (metadata tag "gradient" of player) to player
+			else:
+				set {gradienton::%player's uuid%} to true
+				set {chatcolor::%player's uuid%::*} to 255, 255, 255
+				set {rainbowon::%player's uuid%} to false
+				send "{@gradient} &8| &aTurned Gradient Chat Effect On"
+				set slot 22 of metadata tag "gradient" of player to nether star named "&aTurn Gradient On" with lore "&7Click to change status"
+				open (metadata tag "gradient" of player) to player
+
+		#Red
+		else if index of event-slot is 0:
+			set {chatgradient1::%player's uuid%::*} to 255, 85 and 85
+			send "{@gradient} &8| &aSet First Color Of Gradient To &cRed"
+		else if index of event-slot is 5:
+			set {chatgradient2::%player's uuid%::*} to 255, 85 and 85
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &cRed"
+
+		#Blue
+		else if index of event-slot is 1:
+			set {chatgradient1::%player's uuid%::*} to 85, 85 and 255
+			send "{@gradient} &8| &aSet First Color Of Gradient To &9Blue"
+		else if index of event-slot is 6:
+			set {chatgradient2::%player's uuid%::*} to 85, 85 and 255
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &9Blue"
+
+		#Light Green
+		else if index of event-slot is 2:
+			set {chatgradient1::%player's uuid%::*} to 85, 255 and 85
+			send "{@gradient} &8| &aSet First Color Of Gradient To &aLight Green"
+		else if index of event-slot is 7:
+			set {chatgradient2::%player's uuid%::*} to 85, 255 and 85
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &aLight Green"
+
+		#Dark Green
+		else if index of event-slot is 3:
+			set {chatgradient1::%player's uuid%::*} to 0, 170 and 0
+			send "{@gradient} &8| &aSet First Color Of Gradient To &2Dark Green"
+		else if index of event-slot is 8:
+			set {chatgradient2::%player's uuid%::*} to 0, 170 and 0
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &2Dark Green"
+
+		#Pink
+		else if index of event-slot is 9:
+			set {chatgradient1::%player's uuid%::*} to 255, 85 and 255
+			send "{@gradient} &8| &aSet First Color Of Gradient To &dPink"
+		else if index of event-slot is 14:
+			set {chatgradient2::%player's uuid%::*} to 255, 85 and 255
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &dPink"
+
+		#Purple
+		else if index of event-slot is 10:
+			set {chatgradient1::%player's uuid%::*} to 170, 0 and 170
+			send "{@gradient} &8| &aSet First Color Of Gradient To &5Purple"
+		else if index of event-slot is 15:
+			set {chatgradient2::%player's uuid%::*} to 170, 0 and 170
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &5Purple"
+
+		#Yellow
+		else if index of event-slot is 11:
+			set {chatgradient1::%player's uuid%::*} to 255, 255 and 85
+			send "{@gradient} &8| &aSet First Color Of Gradient To &eYellow"
+		else if index of event-slot is 16:
+			set {chatgradient2::%player's uuid%::*} to 255, 255 and 85
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &eYellow"
+
+		#Light Blue
+		else if index of event-slot is 12:
+			set {chatgradient1::%player's uuid%::*} to 85, 255 and 255
+			send "{@gradient} &8| &aSet First Color Of Gradient To &bLight Blue"
+		else if index of event-slot is 17:
+			set {chatgradient2::%player's uuid%::*} to 85, 255 and 255
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &bLight Blue"
+
+		#White
+		else if index of event-slot is 18:
+			set {chatgradient1::%player's uuid%::*} to 255, 255 and 255
+			send "{@gradient} &8| &aSet First Color Of Gradient To &fWhite"
+		else if index of event-slot is 23:
+			set {chatgradient2::%player's uuid%::*} to 255, 255 and 255
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &fWhite"
+
+		#Black
+		else if index of event-slot is 19:
+			set {chatgradient1::%player's uuid%::*} to 0, 0 and 0
+			send "{@gradient} &8| &aSet First Color Of Gradient To &0Black"
+		else if index of event-slot is 24:
+			set {chatgradient2::%player's uuid%::*} to 0, 0 and 0
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &0Black"
+
+		#Gray
+		else if index of event-slot is 20:
+			set {chatgradient1::%player's uuid%::*} to 85, 85 and 85
+			send "{@gradient} &8| &aSet First Color Of Gradient To &8Gray"
+		else if index of event-slot is 25:
+			set {chatgradient2::%player's uuid%::*} to 85, 85 and 85
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &8Gray"
+
+		#Gold
+		else if index of event-slot is 21:
+			set {chatgradient1::%player's uuid%::*} to 255, 170 and 0
+			send "{@gradient} &8| &aSet First Color Of Gradient To &6Gold"
+		else if index of event-slot is 26:
+			set {chatgradient2::%player's uuid%::*} to 255, 170 and 0
+			send "{@gradient} &8| &aSet Second Color Of Gradient To &6Gold"
+
+on inventory click:
+	if event-inventory is (metadata tag "rainbow" of player):
+		cancel event
+		if index of event-slot is 13:
+			if {rainbowon::%player's uuid%} is true:
+				set {rainbowon::%player's uuid%} to false
+				send "{@rainbow} &8| &cTurned Rainbow Chat Effect Off"
+				set slot 13 of metadata tag "rainbow" of player to nether star named "&aTurn Rainbow On" with lore "&7Click to change status"
+				open (metadata tag "rainbow" of player) to player
+			else:
+				set {rainbowon::%player's uuid%} to true
+				set {gradienton::%player's uuid%} to false
+				set {chatcolor::%player's uuid%::*} to 255, 255, 255
+				send "{@rainbow} &8| &aTurned Rainbow Chat Effect On"
+				set slot 13 of metadata tag "rainbow" of player to nether star named "&cTurn Rainbow Off" with lore "&7Click to change status"
+				open (metadata tag "rainbow" of player) to player
+		if index of event-slot is 2:
+			set {chatrainbowLight::%player's uuid%} to 0.3
+			set slot 2 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.3"
+			set slot 3 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.4"
+			set slot 4 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.5"
+			set slot 5 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.6"
+			set slot 6 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.7"
+			if {chatrainbowLight::%player's uuid%} is 0.3:
+				set slot 2 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.3"
+			else if {chatrainbowLight::%player's uuid%} is 0.4:
+				set slot 3 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.4"
+			else if {chatrainbowLight::%player's uuid%} is 0.5:
+				set slot 4 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.5"
+			else if {chatrainbowLight::%player's uuid%} is 0.6:
+				set slot 5 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.6"
+			else if {chatrainbowLight::%player's uuid%} is 0.7:
+				set slot 6 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.7"
+			open (metadata tag "rainbow" of player) to player
+		else if index of event-slot is 3:
+			set {chatrainbowLight::%player's uuid%} to 0.4
+			set slot 2 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.3"
+			set slot 3 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.4"
+			set slot 4 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.5"
+			set slot 5 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.6"
+			set slot 6 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.7"
+			if {chatrainbowLight::%player's uuid%} is 0.3:
+				set slot 2 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.3"
+			else if {chatrainbowLight::%player's uuid%} is 0.4:
+				set slot 3 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.4"
+			else if {chatrainbowLight::%player's uuid%} is 0.5:
+				set slot 4 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.5"
+			else if {chatrainbowLight::%player's uuid%} is 0.6:
+				set slot 5 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.6"
+			else if {chatrainbowLight::%player's uuid%} is 0.7:
+				set slot 6 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.7"
+			open (metadata tag "rainbow" of player) to player
+		else if index of event-slot is 4:
+			set {chatrainbowLight::%player's uuid%} to 0.5
+			set slot 2 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.3"
+			set slot 3 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.4"
+			set slot 4 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.5"
+			set slot 5 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.6"
+			set slot 6 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.7"
+			if {chatrainbowLight::%player's uuid%} is 0.3:
+				set slot 2 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.3"
+			else if {chatrainbowLight::%player's uuid%} is 0.4:
+				set slot 3 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.4"
+			else if {chatrainbowLight::%player's uuid%} is 0.5:
+				set slot 4 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.5"
+			else if {chatrainbowLight::%player's uuid%} is 0.6:
+				set slot 5 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.6"
+			else if {chatrainbowLight::%player's uuid%} is 0.7:
+				set slot 6 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.7"
+			open (metadata tag "rainbow" of player) to player
+		else if index of event-slot is 5:
+			set {chatrainbowLight::%player's uuid%} to 0.6
+			set slot 2 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.3"
+			set slot 3 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.4"
+			set slot 4 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.5"
+			set slot 5 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.6"
+			set slot 6 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.7"
+			if {chatrainbowLight::%player's uuid%} is 0.3:
+				set slot 2 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.3"
+			else if {chatrainbowLight::%player's uuid%} is 0.4:
+				set slot 3 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.4"
+			else if {chatrainbowLight::%player's uuid%} is 0.5:
+				set slot 4 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.5"
+			else if {chatrainbowLight::%player's uuid%} is 0.6:
+				set slot 5 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.6"
+			else if {chatrainbowLight::%player's uuid%} is 0.7:
+				set slot 6 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.7"
+			open (metadata tag "rainbow" of player) to player
+		else if index of event-slot is 6:
+			set {chatrainbowLight::%player's uuid%} to 0.7
+			set slot 2 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.3"
+			set slot 3 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.4"
+			set slot 4 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.5"
+			set slot 5 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.6"
+			set slot 6 of metadata tag "rainbow" of player to nametag named "&eBrightness: &a0.7"
+			if {chatrainbowLight::%player's uuid%} is 0.3:
+				set slot 2 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.3"
+			else if {chatrainbowLight::%player's uuid%} is 0.4:
+				set slot 3 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.4"
+			else if {chatrainbowLight::%player's uuid%} is 0.5:
+				set slot 4 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.5"
+			else if {chatrainbowLight::%player's uuid%} is 0.6:
+				set slot 5 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.6"
+			else if {chatrainbowLight::%player's uuid%} is 0.7:
+				set slot 6 of metadata tag "rainbow" of player to nametag of mending 1 named "&eBrightness: &a0.7"
+			open (metadata tag "rainbow" of player) to player
+
+on join:
+	if {chatcolor1::%player's uuid%::*} is not set:
+		set {chatcolor1::%player's uuid%::*} to 170, 170 and 170
+	if {chatcolor2::%player's uuid%::*} is not set:
+		set {chatcolor2::%player's uuid%::*} to 170, 170 and 170
+	if {chatrainbowLight::%player's uuid%} is not set:
+		set {chatrainbowLight::%player's uuid%} to 0.6
+
+on quit:
+	set {Nickname::%player's uuid%} to "%player%"
+	set the quit message to "&8[&c-&8] %player's prefix%%{Nickname::%player's uuid%}%"

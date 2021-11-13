@@ -1,0 +1,382 @@
+options:
+	prefix: &6[Clans]&f
+
+function Clans_OfflinePlayers(clan: string) :: players:
+	loop {Clans::%{S}%::Clans::%{_clan}%::members::*}:
+		add loop-value parsed as an offline player to {_p::*}
+	return {_p::*}
+
+function Clans_AdminPlayers(clan: string) :: players:
+	loop {Clans::%{S}%::Clans::%{_clan}%::admins::*}:
+		add loop-value parsed as an offline player to {_p::*}
+	return {_p::*}
+
+function Clans_OfflinePlayersTXT(clan: string) :: string:
+	loop {Clans::%{S}%::Clans::%{_clan}%::members::*}:
+		add loop-value parsed as an offline player to {_p::*}
+	return "%{_p::*}%"
+
+function Clans_AdminPlayersTXT(clan: string) :: string:
+	loop {Clans::%{S}%::Clans::%{_clan}%::admins::*}:
+		add loop-value parsed as an offline player to {_p::*}
+	return "%{_p::*}%"
+
+command /clan [<text>] [<text>] [<text>] [<text>] [<integer>]:
+	aliases: /c, /clans
+	trigger:
+		if arg-1 is "create":
+			if {Clans::%{S}%::Users::%player's uuid%::Clan} is not set:
+				if arg-2 is set:
+					if arg-3 is not set:
+						if arg-2 does not contain "-", ".", ";", ":", "@", ",", "/" or "!":
+							if {Clans::%{S}%::filter::*} does not contain arg-2:
+								if {Clans::%{S}%::ClanList::*} does not contain arg-2:
+									add arg-2 to {Clans::%{S}%::ClanList::*}
+									set {Clans::%{S}%::Clans::%arg-2%::owner} to player's uuid
+									add player's uuid to {Clans::%{S}%::Clans::%arg-2%::members::*}
+									add player's uuid to {Clans::%{S}%::Clans::%arg-2%::admins::*}
+									set {Clans::%{S}%::Users::%player's uuid%::Clan} to arg-2
+									set {Clans::%{S}%::Clans::%arg-2%::name} to "&6%arg-2%"
+									send "{@prefix} Created the clan &6%arg-2%&f. "
+							else:
+								send "{@prefix} You cannot name your clan this."
+						else:
+							send "{@prefix} Your clan name contains illegal characters."
+					else:
+						send "{@prefix} Clan names can only be one word."
+				else:
+					send "{@prefix} Please enter a clan name."
+			else:
+				send "{@prefix} You're already in a clan."
+		else if arg-1 is "delete":
+			if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+				set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+				if {Clans::%{S}%::Clans::%{_clan}%::owner} is player's uuid:
+					loop {Clans::%{S}%::Clans::%{_clan}%::members::*}:
+						delete {Clans::%{S}%::Users::%loop-value%::clan}
+					delete {Clans::%{S}%::Clans::%{_clan}%::*}
+					remove {_clan} from {Clans::%{S}%::ClanList::*}
+					send "{@prefix} Clan &6%{_clan}%&f deleted."
+				else:
+					send "{@prefix} Only the clan owner can delete the clan."
+			else:
+				send "{@prefix} You're not in a clan."
+		else if arg-1 is "rename":
+			if arg-2 is set:
+				if arg-3 is not set:
+					if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+						set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+						if {Clans::%{S}%::Clans::%{_clan}%::owner} is player's uuid:
+							if {Clans::%{S}%::clanList::*} does not contain arg-2:
+								loop {Clans::%{S}%::Clans::%{_clan}%::members::*}:
+									set {Clans::%{S}%::Users::%loop-value%::clan} to arg-2
+								set {Clans::%{S}%::Clans::%arg-2%::owner} to {Clans::%{S}%::Clans::%{_clan}%::owner}
+								set {Clans::%{S}%::Clans::%arg-2%::admins::*} to {Clans::%{S}%::Clans::%{_clan}%::admins::*}
+								set {Clans::%{S}%::Clans::%arg-2%::members::*} to {Clans::%{S}%::Clans::%{_clan}%::members::*}
+								set {Clans::%{S}%::Clans::%arg-2%::home} to {Clans::%{S}%::Clans::%{_clan}%::home}
+								set {Clans::%{S}%::Clans::%arg-2%::name} to "&6%arg-2%"
+								delete {Clans::%{S}%::Clans::%{_clan}%::*}
+								remove {_clan} from {Clans::%{S}%::clanList::*}
+								add arg-2 to {Clans::%{S}%::clanList::*}
+								send "{@prefix} Clan &6%{_clan}%&f has been renamed to &6%arg-2%&f."
+							else:
+								send "{@prefix} There is already a clan with that name."
+						else:
+							send "{@prefix} Only the clan owner can rename the clan."
+					else:
+						send "{@prefix} You're not in a clan."
+				else:
+					send "{@prefix} Clan names can only be one word."
+			else:
+				send "{@prefix} Please enter a new clan name."
+		else if arg-1 is "promote":
+			if arg-2 is set:
+				if arg-3 is not set:
+					if {Clans::%{S}%::users::%player's uuid%::clan} is set:
+						set {_clan} to {Clans::%{S}%::users::%player's uuid%::clan}
+						if {Clans::%{S}%::Clans::%{_clan}%::owner} is player's uuid:
+							if (arg-2 parsed as an offline player) is an offline player:
+								set {_p} to (arg-2 parsed as an offline player)
+								set {_u} to {_p}'s uuid
+								if {Clans::%{S}%::Clans::%{_clan}%::members::*} contains {_u}:
+									if {Clans::%{S}%::Clans::%{_clan}%::admins::*} does not contain {_u}:
+										add {_u} to {Clans::%{S}%::Clans::%{_clan}%::admins::*}
+										send "{@prefix} &6%{_p}% &fhas been made an admin in the clan." to Clans_OfflinePlayers({_clan})
+									else:
+										send "{@prefix} &6%{_p}% &fis already an admin."
+								else:
+									send "{@prefix} &6%{_p}% &fis not in the clan."
+							else: 
+								send "{@prefix} Invalid playername."
+						else:
+							send "{@prefix} Only the clan owner can promote a player."
+					else:
+						send "{@prefix} You're not in a clan."
+				else:
+					send "{@prefix} Playernames cannot be more than one word."
+			else:
+				send "{@prefix} Please enter a playername."
+		else if arg-1 is "demote":
+			if arg-2 is set:
+				if arg-3 is not set:
+					if {Clans::%{S}%::users::%player's uuid%::clan} is set:
+						set {_clan} to {Clans::%{S}%::users::%player's uuid%::clan}
+						if {Clans::%{S}%::Clans::%{_clan}%::owner} is player's uuid:
+							if (arg-2 parsed as an offline player) is an offline player:
+								set {_p} to (arg-2 parsed as an offline player)
+								set {_u} to {_p}'s uuid
+								if {Clans::%{S}%::Clans::%{_clan}%::members::*} contains {_u}:
+									if {Clans::%{S}%::Clans::%{_clan}%::admins::*} contains {_u}:
+										if {Clans::%{S}%::Clans::%{_clan}%::owner} is not {_u}:
+											remove {_u} from {Clans::%{S}%::Clans::%{_clan}%::admins::*}
+											send "{@prefix} &6%{_p}% &fhas been demoted." to Clans_OfflinePlayers({_clan})
+										else:
+											send "{@prefix} You cannot demote the clan owner."
+									else:
+										send "{@prefix} &6%{_p}% &fis not an admin."
+								else:
+									send "{@prefix} &6%{_p}% &fis not in the clan."
+							else: 
+								send "{@prefix} Invalid playername."
+						else:
+							send "{@prefix} Only the clan owner can demote a player."
+					else:
+						send "{@prefix} You're not in a clan."
+				else:
+					send "{@prefix} Playernames cannot be more than one word."
+			else:
+				send "{@prefix} Please enter a playername."
+		else if arg-1 is "info":
+			if arg-2 is not set:
+				if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+					set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+					send "{@prefix} Clan &6%{_clan}%&f information.%newline%&7> &cOwner: &f%{clans::%{S}%::Clans::%{_clan}%::owner} parsed as an offline player%%newline%&7> &cAdmins: &f%Clans_AdminPlayersTXT({_clan})%%newline%%newline%&7> &cMembers: &f%size of {clans::%{S}%::Clans::%{_clan}%::members::*}%%newline%&7> &cMember List: &f%Clans_OfflinePlayersTXT({_clan})%%newline%"
+				else:
+					send "{@prefix} You're not in a clan."
+			else if arg-2 is "player":
+				if arg-3 is set:
+					if arg-4 is not set:
+						if (arg-3 parsed as an offline player) is an offline player:
+							set {_p} to arg-3 parsed as an offline player
+							set {_u} to {_p}'s uuid
+							if {Clans::%{S}%::Users::%{_u}%::clan} is set:
+								set {_clan} to {Clans::%{S}%::Users::%{_u}%::clan}
+								send "{@prefix} Player&6 %{_p}%&f's clan information.%newline%&7> &cName: &f%{_clan}%%newline%&7> &cOwner: &f%{clans::%{S}%::Clans::%{_clan}%::owner} parsed as an offline player%%newline%&7> &cAdmins: &f%Clans_AdminPlayersTXT({_clan})%%newline%%newline%&7> &cMembers: &f%size of Clans_OfflinePlayers({_clan})%%newline%&7> &cMember List: &f%Clans_OfflinePlayersTXT({_clan})%%newline%"
+							else:
+								send "{@prefix} &6%{_p}% &fis not in a clan."
+						else:
+							send "{@prefix} Invalid playername."
+					else:
+						send "{@prefix} Playernames can only be one word."
+				else:
+					send "{@prefix} Please enter a playername."
+			else if arg-2 is "clan":
+				if arg-3 is set:
+					if arg-4 is not set:
+						if {Clans::%{S}%::ClanList::*} contains arg-3:
+							set {_clan} to arg-3
+							send "{@prefix} Clan &6%{_clan}%&f information.%newline%&7> &cOwner: &f%{clans::%{S}%::Clans::%{_clan}%::owner} parsed as an offline player%%newline%&7> &cAdmins: &f%Clans_AdminPlayersTXT({_clan})%%newline%%newline%&7> &cMembers: &f%size of {clans::%{S}%::Clans::%{_clan}%::members::*}%%newline%&7> &cMember List: &f%Clans_OfflinePlayersTXT({_clan})%%newline%"
+						else:
+							send "{@prefix} There is not a clan with that name."
+					else:
+						send "{@prefix} Clan names can only be one word."
+				else:
+					send "{@prefix} Please enter a clan name."
+			else:
+				send "{@prefix} &c/clan info &7>%newline% &f[player|clan] [information] &7&o> Displays clan information."
+		else if arg-1 is "invite":
+			if arg-2 is set:
+				if arg-3 is not set:
+					if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+						set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+						if {Clans::%{S}%::Clans::%{_clan}%::admins::*} contains player's uuid:
+							if (arg-2 parsed as an offline player) is an offline player:
+								set {_p} to arg-2 parsed as an offline player
+								set {_u} to {_p}'s uuid
+								if {Clans::%{S}%::Clans::%{_clan}%::members::*} does not contain {_u}:
+									if {Clans::%{S}%::Users::%{_u}%::clan} is not set:
+										set {Clans::%{S}%::Users::%{_u}%::request} to {_clan}
+										send "{@prefix} Invited &6%{_p}%&f to the clan."
+										send "{@prefix} You have been invited to join &6%{_clan}% &fby &6%player%&f." to {_p}
+										send "{@prefix} &6%arg-2%&f has been invited to join the clan by &6%player%&f." to Clans_OfflinePlayers({_clan})
+									else:
+										send "{@prefix} This player is already in a clan."
+								else:
+									send "{@prefix} This player is already in your clan."
+							else:
+								send "{@prefix} Invalid playername."
+						else:
+							send "{@prefix} Only clan admins or the clan owner can invite players."
+					else:
+						send "{@prefix} You're not in a clan."
+				else:
+					send "{@prefix} Playernames can only be one word."
+			else:
+				send "{@prefix} Please enter a playername."
+		else if arg-1 is "join":
+			if arg-2 is not set:
+				if {Clans::%{S}%::Users::%player's uuid%::clan} is not set:
+					if {Clans::%{S}%::Users::%player's uuid%::request} is set:
+						set {_request} to {Clans::%{S}%::Users::%player's uuid%::request}
+						if {Clans::%{S}%::ClanList::*} contains {_request}:
+							set {Clans::%{S}%::Users::%player's uuid%::clan} to {_request}
+							add player's uuid to {Clans::%{S}%::Clans::%{_request}%::members::*}
+							send "{@prefix} You have joined &6%{_request}%&f."
+							send "{@prefix} &6%player% &fhas joined the clan." to Clans_OfflinePlayers({Clans::%{S}%::Users::%player's uuid%::clan})
+							delete {Clans::%{S}%::Users::%player's uuid%::request}
+						else:
+							send "{@prefix} This clan no longer exists."
+					else:
+						send "{@prefix} You have no pending requests."
+				else:
+					send "{@prefix} You are already in a clan."
+			else:
+				send "{@prefix} This command does not require a second argument."
+		else if arg-1 is "kick":
+			if arg-2 is set:
+				if arg-3 is not set:
+					if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+						set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+						if {Clans::%{S}%::Clans::%{_clan}%::admins::*} contains player's uuid:
+							if (arg-2 parsed as an offline player) is an offline player:
+								set {_p} to (arg-2 parsed as an offline player)
+								set {_u} to {_p}'s uuid
+								if {Clans::%{S}%::Clans::%{_clan}%::members::*} contains {_u}:
+									if {_u} is not {Clans::%{S}%::Clans::%{_clan}%::owner}:
+										delete {Clans::%{S}%::Users::%{_u}%::clan}
+										remove {_u} from {Clans::%{S}%::Clans::%{_clan}%::admins::*}
+										remove {_u} from {Clans::%{S}%::Clans::%{_clan}%::members::*}
+										send "{@prefix} &6%{_p}% &fhas been kicked." to Clans_OfflinePlayers({_clan})
+									else:
+										send "{@prefix} You cannot kick the owner of the clan."
+								else:
+									send "{@prefix} This player is not in the clan."
+							else:
+								send "{@prefix} Invalid playername."
+						else:
+							send "{@prefix} Only clan admins or the clan owner can kick players."
+					else:
+						send "{@prefix} You are not in a clan."
+				else:
+					send "{@prefix} Playernames can only be one word."
+			else:
+				send "{@prefix} Please enter a playername."
+		else if arg-1 is "leave":
+			if arg-2 is not set:
+				if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+					set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+					if player's uuid is not {Clans::%{S}%::Clans::%{_clan}%::owner}:
+						delete {Clans::%{S}%::Users::%player's uuid%::clan}
+						remove player's uuid from {Clans::%{S}%::Clans::%{_clan}%::admins::*}
+						remove player's uuid from {Clans::%{S}%::Clans::%{_clan}%::members::*}
+						send "{@prefix} &6%player% &fhas left the clan." to Clans_OfflinePlayers({_clan})
+					else:
+						send "{@prefix} You can't leave your own clan, you must delete it to leave."
+				else:
+					send "{@prefix} You are not in a clan."
+			else:
+				send "{@prefix} This command does not require a second argument."
+		else if arg-1 is "chat":
+			if arg-2 is not set:
+				if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+					if {clans::%{S}%::Users::%player's uuid%::chat} is not set:
+						set {clans::%{S}%::Users::%player's uuid%::chat} to true
+						send "{@prefix} Clan chat &aenabled&f."
+					else:
+						delete {clans::%{S}%::Users::%player's uuid%::chat}
+						send "{@prefix} Clan chat &cdisabled&f."
+				else:
+					send "{@prefix} You're not in a clan."
+			else:
+				send "{@prefix} This command does not require a second argument."
+		else if arg-1 is "sethome":
+			if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+				set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+				if {Clans::%{S}%::Clans::%{_clan}%::admins::*} contains player's uuid:
+					set {Clans::%{S}%::Clans::%{_clan}%::home} to player's location
+					send "{@prefix} Set the clan home to &6%player's location%&f."
+				else:
+					send "{@prefix} Only a clan admin or the clan owner can execute this command."
+			elsE:
+				send "{@prefix} You're not in a clan."
+		else if arg-1 is "home":
+			if {Clans::%{S}%::Users::%player's uuid%::clan} is set:
+				set {_clan} to {Clans::%{S}%::Users::%player's uuid%::clan}
+				if {Clans::%{S}%::Clans::%{_clan}%::home} is set:
+					teleport player to {Clans::%{S}%::Clans::%{_clan}%::home}
+					send "{@prefix} Teleported you to the clan home."
+				else:
+					send "{@prefix} Your clan has not set a home."
+			else:
+				send "{@prefix} You're not in a clan."
+		else if arg-1 is "admin":
+			if player has permission "clans.admin":
+				if arg-2 is set:
+					if arg-2 is "delete":
+						if arg-3 is set:
+							if arg-4 is not set:
+								if {Clans::%{S}%::ClanList::*} contains arg-3:
+									loop {Clans::%{S}%::Clans::%arg-3%::members::*}:
+										delete {Clans::%{S}%::Users::%loop-value%::clan}
+									delete {Clans::%{S}%::Clans::%arg-3%::*}
+									remove arg-3 from {Clans::%{S}%::clanList::*}
+									send "{@prefix} Clan &6%arg-3% &fdeleted."
+								else:
+									send "{@prefix} There is not a clan named &6%arg-3%&f."
+							else:
+								send "{@prefix} This command does not require a fourth argument."
+						else:
+							send "{@prefix} Please type a clan name."
+					else if arg-2 is "filter":
+						if arg-3 is set:
+							if arg-3 is "add":
+								if arg-4 is set:
+									if arg-4 does not contain "-", ".", ";", ":", "@", ",", "/" or "!":
+										add arg-4 to {Clans::%{S}%::filter::*}
+									else:
+										send "{@prefix} This clan name contains illegal characters."
+								else:
+									send "{@prefix} Enter a clan name."
+							else if arg-3 is "remove":
+								if arg-4 is set:
+									if arg-4 does not contain "-", ".", ";", ":", "@", ",", "/" or "!":
+										remove arg-4 from {Clans::%{S}%::filter::*}
+									else:
+										send "{@prefix} This clan name contains illegal characters."
+								else:
+									send "{@prefix} Enter a clan name."
+							else:
+								send "&7>&c /clan admin arguments%newline%&7>&f filter (add|remove) (name) &7&O- Add or remove a name from the name filter."
+						else:
+							send "&7>&c /clan admin arguments%newline%&7>&f filter (add|remove) (name) &7&O- Add or remove a name from the name filter."
+					else:
+						send "&7>&c /clan admin arguments%newline%&7>&c (required)&7, &c[optional]%newline%%newline%&7>&f filter (add|remove) (name) &7&O- Add or remove a name from the name filter.%newline%&7>&f delete (clan name) &7&O- Delete a clan."
+				else:
+					send "&7>&c /clan admin arguments%newline%&7>&c (required)&7, &c[optional]%newline%%newline%&7>&f filter (add|remove) (name) &7&O- Add or remove a name from the name filter.%newline%&7>&f delete (clan name) &7&O- Delete a clan."
+			else:
+				send "{@prefix} You do not have the correct permissions."
+		else:
+			send "&7>&c /clan arguments%newline%&7>&c (required)&7, &c[optional]%newline%%newline%&7>&f create (name) &7&O- Create your clan.%newline%&7>&f info [clan|player] [information]&7&O- Your or another player's clan info.%newline%&7>&f join &7&O- Accept an invitation.%newline%&7>&f leave &7&O- Leave your current clan.%newline%&7>&f chat &7&O- Toggles your clan chat.%newline%&7>&f home &7&O- Teleports you to your clan home.%newline%%newline%&cAdmin Commands &7You must have admin role in your clan.%newline%%newline%&7>&f invite (player) &7&O- Invite a player.%newline%&7>&f kick (player) &7&O- Kick a player from the clan.%newline%&7>&f promote (player) &7&O- Promote a player to admin.%newline%&7>&f demote (player) &7&O- Revoke an admin rank.%newline%&7>&f sethome &7&O- Sets the home to your location.%newline%%newline%&cOwner Commands &7You must have owner role in your clan.%newline%%newline%&7>&f delete &7&O- Delete your clan.%newline%&7>&f rename &7&O- Renames your clan.%newline%%newline%&cClan Admin Control &7You must have the permission ""clans.admin"".%newline%%newline%&7>&f For all commands, &6/clan admin&f."
+
+on quit:
+	delete {Clans::%{S}%::Users::%player's uuid%::request}
+	set {clans::%{S}%::Users::%player's uuid%::chat} to false
+
+on chat:
+  {clans::%{S}%::Users::%player's uuid%::clan} is set
+  if {clans::%{S}%::Users::%player's uuid%::chat} is true:
+    cancel event
+    send "{@prefix} &b[CHAT] &f%player%: %message%" to all players where [{Clans::%{S}%::Users::%player input's uuid%::clan} is {Clans::%{S}%::Users::%player's uuid%::clan}]
+  else:
+    if first character of message is "=":
+      message is not "="
+      cancel event
+      set {_c} to subtext of message from characters 2 to (length of message)
+      send "{@prefix} &b[CHAT] &f%player%: %{_c}%" to all players where [{Clans::%{S}%::Users::%player input's uuid%::clan} is {Clans::%{S}%::Users::%player's uuid%::clan}]
+
+on damage:
+  if {Clans::%{S}%::Users::%attacker's uuid%::clan} is set:
+    if {Clans::%{S}%::Clans::%{Clans::%{S}%::Users::%attacker's uuid%::clan}%::Members::*} contains victim's uuid:
+      cancel event
+      send "{@prefix} You can't attack a clan member!" to attacker
+

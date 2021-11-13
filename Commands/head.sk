@@ -1,0 +1,7 @@
+command /head <offline player>:
+	permission: skript.head
+	aliases: /skull
+	usage: &cUsage: /head (player)
+	trigger:
+		give (skull of arg-1) to player
+		send "&a&lHead &8| &aHead of %arg-1%&a given."
