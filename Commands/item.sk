@@ -1,6 +1,6 @@
 command /item <string> [<integer>] [<string>]:
 	aliases: /i
-	permission: skript.item
+	permission: command.item
 	usage: &cUsage: /item (item) [amount] [name]
 	trigger:
 		set {_amount} to arg-2

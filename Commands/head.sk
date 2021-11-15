@@ -1,5 +1,5 @@
 command /head <offline player>:
-	permission: skript.head
+	permission: command.head
 	aliases: /skull
 	usage: &cUsage: /head (player)
 	trigger:

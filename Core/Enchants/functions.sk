@@ -9,12 +9,12 @@ function insertEnchantGui(p: player):
 
 	set {_i} to 1
 	loop 27 times:
-		set slot {_i} of {_gui} to magenta stained glass pane named "&c"
+		set slot {_i} of {_gui} to red stained glass pane named "&c"
 		add 2 to {_i}
 
 	set {_i} to 0
 	loop 27 times:
-		set slot {_i} of {_gui} to green stained glass pane named "&c"
+		set slot {_i} of {_gui} to blue stained glass pane named "&c"
 		add 2 to {_i}
 
 	set slots 29, 30, 31, 32, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50 and 51 of {_gui} to black stained glass pane named "&c"
@@ -31,8 +31,8 @@ function enchantGui(p: player, item: item, page: number):
 		set {_type} to loop-value
 	if {_type} is not set:
 		close {_p}'s inventory
-		give {_p} {_item}
 		send "{@prefix} &cYou cannot enchant the item %{_item}%" to {_p}
+		stop trigger
 	set {_gui} to chest inventory with 6 rows named "   &2&l&k0000&r &d&lEnchant Menu&r &2&l&k0000"
 
 	set {_i} to 0
@@ -47,7 +47,7 @@ function enchantGui(p: player, item: item, page: number):
 	
 	set slot 49 of {_gui} to {_item}
 
-	set {_gui} to enchant_format("sword", {_gui}, {_item}, {_page})
+	set {_gui} to enchant_format({_type}, {_gui}, {_item}, {_page})
 	if ((size of {enchants::category::%{_type}%::enchants::*}) - ({_page}*9)) > 9:
 		set slot 53 of {_gui} to {_skull::1} named "&eNext page"
 	if {_page} > 0:
@@ -63,10 +63,11 @@ function enchant_format(type: string, gui: inventory, item: item, page: number) 
 		if {_i} > (({_page} * 9) - 1) :
 			{_i} < (({_page} + 1) * 9)
 			set {_name} to "%loop-value%"
+			set {_NName} to {_name}
 			replace all " " with "" in {_name}
 			set {_i2} to 1
 			loop {enchants::list::%{_name}%::max} times:
-				set slot (({_i} - ({_page}*9)) + 45 - ({_i2}*9)) of {_gui} to enchanted book named "&r&6%loop-value-1% %{_i2}%" with lore "&ePrice: %(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}% exp" and "&7ID - %{_name}%-%(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}%-%{_i2}%" # I fixed it.
+				set slot (({_i} - ({_page}*9)) + 45 - ({_i2}*9)) of {_gui} to enchanted book named "&r&6%loop-value-1% %{_i2}%" with lore "&ePrice: %(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}% exp" and "&7ID - %{_NName}%-%(({_i2} - 1)*{enchants::list::%{_name}%::increase})+{enchants::list::%{_name}%::start}%-%{_i2}%" # I fixed it.
 				add 1 to {_i2}
 		add 1 to {_i}
 	return {_gui}
@@ -84,10 +85,8 @@ function enchant_execute(gui: inventory, slot: number, p: player) :: item:
 
 	set {_item} to slot 49 of {_gui}
 
-	broadcast "A: %{_enchant}% B: %{_price}% C: %{_level}%"
-
 	if {_p}'s level is more than or equal to {_price}:
-		enchant {_item} with ("%{_enchant}% %{_level}%" parsed as an enchantment type) # Fixed as of 10:57
+		enchant {_item} with ("%{_enchant}% %{_level}%" parsed as an enchantment type)
 		play sound "block.note_block.pling" for {_p}
 		reduce {_p}'s level by {_price}
 	else:

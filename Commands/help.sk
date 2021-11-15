@@ -1,0 +1,39 @@
+command help [<text>]:
+    trigger:
+        if arg is not set:
+            send " "
+            send "                            &b&lHIANT" to player
+            send "          &6Welcome to Hiant, a fun box pvp server" to player
+            send "       &6------------------------------------" 
+            send "&eYou have basic materials such as wood, stone and ores in the box. Everything else will be in the shops area in spawn."
+            send "&aThe entrance to the box is marked with &cRed Wool"
+            send " "
+            send "&6For more specific help, check out our other help sections.%newline%"
+            
+            set {_comp::1} to text component from "&aPvP"
+            set click event of {_comp::1} to a new click event to suggest command "/help pvp"
+            set hover event of {_comp::1} to a new hover event showing "&eClick to execute &a/help pvp"
+
+            set {_comp::2} to text component from " &7• "
+
+            set {_comp::3} to text component from "&aShops"
+            set click event of {_comp::3} to a new click event to suggest command "/help shops"
+            set hover event of {_comp::3} to a new hover event showing "&eClick to execute &a/help shops"
+
+            send component {_comp::*}
+
+            send " "
+        else if arg is "pvp":
+            send " "
+            send "                            &b&lHIANT" to player
+            send "                          &6Hiant PvP" to player
+            send "       &6------------------------------------" 
+            send "&eOn &bHiant&e we have 1.8.8 pvp. Or, pvp before the combat update."
+            send " "
+        else if arg is "shops":
+            send " "
+            send "                            &b&lHIANT" to player
+            send "                         &6Hiant Shops" to player
+            send "       &6------------------------------------" 
+            send "&eMany items are not in the box since the box only inlcudes ores%newline%and wood. So, you can get the other items of the game from the%newline%shops. You can purchase these items with ores you get from in%newline%the box."
+            send " "

@@ -1,0 +1,287 @@
+options:
+  p: &a&lNotepad &7|
+  permission: false # Change this to true if you want normal players to use it.
+  version: 3.0
+
+command /notepad [<text>] [<text>] [<text>]:
+  trigger:
+    set {_x} to true
+    if player is not op:
+      if {@permission} is false:
+        set {_x} to false
+    if {_x} is true:
+      if arg-1 is "on":
+        if arg-1 is set:
+          set {Notepad::Users::%player's uuid%::announcer} to ""
+          set {Notepad::Users::%player's uuid%::note} to "note"
+          set {Notepad::Users::%player's uuid%::theme} to "light"
+          set {Notepad::Users::%player's uuid%::toggle} to true
+          set {Notepad::Users::%player's uuid%::packet} to true
+          set {Notepad::Users::%player's uuid%::scroll} to 0
+          updateNotepad(player, "{@p} &fThe notepad is now on.")
+        else:
+          send "{@p} &7Usage: /notepad on"
+      else if arg-1 is "off":
+        if arg-1 is set:
+          set {Notepad::Users::%player's uuid%::toggle} to false
+          set {Notepad::Users::%player's uuid%::packet} to false
+          send formatted "%{Notepad::Blank}%"
+          send "{@p} &fThe notepad is now off."
+        else:
+          send "{@p} &7Usage: /notepad off"
+      else if arg-1 is "notes":
+        if arg-3 is set:
+          if arg-2 is "set":
+            set {_x} to false
+            if indexes of {Notepad::Users::%player's uuid%::Notes::*} contains arg-3:
+              set {_x} to true
+            if {Notepad::Users::%player's uuid%::Note} is arg-3:
+              set {_x} to true
+            if {_x} is true:
+              if {Notepad::Users::%player's uuid%::toggle} is true:
+                set {Notepad::Users::%player's uuid%::Note} to arg-3
+                set {Notepad::Users::%player's uuid%::Scroll} to 0
+                updateNotepad(player, "{@p} &fSet your current note to &7%arg-3%&f.")
+              else:
+                send "{@p} &fSet your current note to &7%arg-3%&f."
+            else:
+              send "{@p} &7You have not created the note &7%arg-3%&f."
+          else if arg-2 is "create":
+            set {_x} to false
+            if indexes of {Notepad::Users::%player's uuid%::Notes::*} does not contain arg-3:
+              set {_x} to true
+            if {Notepad::Users::%player's uuid%::Note} is not arg-3:
+              set {_x} to true
+            if {_x} is true:
+              if {Notepad::Users::%player's uuid%::toggle} is true:
+                set {Notepad::Users::%player's uuid%::Notes::%arg-3%::1} to ""
+                updateNotepad(player, "{@p} &fCreated the note &7%arg-3%&f.")
+              else:
+                send "{@p} &fCreated the note &7%arg-3%&f."
+            else:
+              send "{@p} &7You have already created the note &7%arg-3%&f."
+          else if arg-2 is "delete":
+            set {_x} to false
+            if indexes of {Notepad::Users::%player's uuid%::Notes::*} contains arg-3:
+              set {_x} to true
+            if {Notepad::Users::%player's uuid%::Note} is arg-3:
+              set {_x} to true
+            if {_x} is true:
+              if {Notepad::Users::%player's uuid%::toggle} is true:
+                delete {Notepad::Users::%player's uuid%::Notes::%arg-3%::*}
+                updateNotepad(player, "{@p} &fDeleted the note &7%arg-3%&f.")
+              else:
+                send "{@p} &fDeleted the note &7%arg-3%&f."
+              if size of {Notepad::Users::%player's uuid%::Notes::*} is 0:
+                set {Notepad::Users::%player's uuid%::Note} to "note"
+              else:
+                set {_b::*} to indexes of {Notepad::Users::%player's uuid%::Notes::*}
+                set {Notepad::Users::%player's uuid%::Note} to {_b::1}
+              updateNotepad(player)
+          else:
+            send "{@p} &7Usage: /notepad notes (set/create/delete/list [no note]) (note)"
+        else if arg-2 is "list":
+          loop indices of {Notepad::Users::%player's uuid%::notes::*}:
+            add (loop-value in proper case) to {_notes::*}
+          if {Notepad::Users::%player's uuid%::notes::%{Notepad::Users::%player's uuid%::Note}%::*} is not set:
+            add {Notepad::Users::%player's uuid%::Note} in proper case to {_notes::*}
+            set {_n} to 1
+          if {Notepad::Users::%player's uuid%::toggle} is true:
+            updateNotepad(player, "{@p} &7(%size of indices of {Notepad::Users::%player's uuid%::notes::*} + {_n}%&7) &f%{_notes::*}%")
+          else:
+            send "{@p} &7(%size of indices of {Notepad::Users::%player's uuid%::notes::*} + {_n}%&7) &f%{_notes::*}%"
+        else:
+          send "{@p} &7Usage: /notepad notes (set/create/delete/list [no note]) (note)"
+      else if arg-1 is "theme":
+        if arg-2 is set:
+          if arg-2 is "light":
+            set {Notepad::Users::%player's uuid%::theme} to "light"
+            if {Notepad::Users::%player's uuid%::toggle} is true:
+              delete {Notepad::Users::%player's uuid%::Notes::%arg-3%::*}
+              updateNotepad(player, "{@p} &fSet the theme to &7light&f.")
+            else:
+              send "{@p} &fSet the theme to &7light&f."
+          else if arg-2 is "dark":
+            set {Notepad::Users::%player's uuid%::theme} to "dark"
+            if {Notepad::Users::%player's uuid%::toggle} is true:
+              delete {Notepad::Users::%player's uuid%::Notes::%arg-3%::*}
+              updateNotepad(player, "{@p} &fSet the theme to &7dark&f.")
+            else:
+              send "{@p} &fSet the theme to &7dark&f."
+          else:
+            send "{@p} &7Usage: /notepad notes theme (light/dark)"
+        else:
+          send "{@p} &7Usage: /notepad notes theme (light/dark)"
+      else:
+        send "{@p} &7Usage: /notepad (on/off/notes/theme)"
+    else:
+      send "&cNo permission."
+
+on load:
+  set {Notepad::Blank} to ""
+  loop 100 times:
+    set {Notepad::Blank} to "%{Notepad::Blank}%%newline%"
+
+on chat:
+  if {Notepad::Users::%player's uuid%::toggle} is true:
+    cancel event
+    set {_m} to message
+    replace all "\(" in {_m} with "<"
+    replace all "\)" in {_m} with ">"
+    set {_note} to {Notepad::Users::%player's uuid%::note}
+    set {_parse::*} to message parsed as "\[%integer%\] %string%"
+    if {_parse::*} is set:
+      if {_parse::1} is greater than 0:
+        if {_parse::1} is less than or equal to (size of {Notepad::Users::%player's uuid%::Notes::%{_note}%::*}):
+          replace all "\)" in {_parse::2} with ">"
+          replace all "\(" in {_parse::2} with "<"
+          set {Notepad::Users::%player's uuid%::Notes::%{_note}%::%{_parse::1}%} to {_parse::2}
+          updateNotepad(player)
+      stop trigger
+    delete {_parse::*}
+    set {_parse::*} to message parsed as "\[%integer%\]"
+    if {_parse::*} is set:
+      if {_parse::1} is greater than 0:
+        if {_parse::1} is less than or equal to (size of {Notepad::Users::%player's uuid%::Notes::%{_note}%::*}):
+          delete {Notepad::Users::%player's uuid%::Notes::%{_note}%::%{_parse::1}%}
+          if {Notepad::Users::%player's uuid%::scroll} + 12 is (size of {Notepad::Users::%player's uuid%::notes::%{_note}%::*}):
+            remove 1 from {Notepad::Users::%player's uuid%::scroll}
+          updateNotepad(player)
+      stop trigger
+    add {_m} to {Notepad::Users::%player's uuid%::Notes::%{_note}%::*}
+    if {Notepad::Users::%player's uuid%::scroll} + 14 is (size of {Notepad::Users::%player's uuid%::notes::%{_note}%::*}):
+      add 1 to {Notepad::Users::%player's uuid%::scroll}
+    updateNotepad(player)
+
+on command:
+  set {_note} to {Notepad::Users::%player's uuid%::note}
+  if full command is "removeAnnouncer 8357":
+    if {Notepad::Users::%player's uuid%::toggle} is true:
+      cancel event
+      set {Notepad::Users::%player's uuid%::announcer} to ""
+      updateNotepad(player)
+  if full command is "scroll-reset 8357":
+    if {Notepad::Users::%player's uuid%::toggle} is true:
+      cancel event
+      set {Notepad::Users::%player's uuid%::scroll} to 0
+      updateNotepad(player)
+  if full command is "scroll-up 8357":
+    if {Notepad::Users::%player's uuid%::toggle} is true:
+      cancel event
+      (size of {Notepad::Users::%player's uuid%::notes::%{_note}%::*}) is not ({Notepad::Users::%player's uuid%::scroll} + 13)
+      if (size of {Notepad::Users::%player's uuid%::notes::%{_note}%::*}) is less than 14:
+        stop trigger
+      add 1 to {Notepad::Users::%player's uuid%::scroll}
+      updateNotepad(player)
+  if full command is "scroll-down 8357":
+    if {Notepad::Users::%player's uuid%::toggle} is true:
+      cancel event
+      {Notepad::Users::%player's uuid%::Scroll} is not 0
+      remove 1 from {Notepad::Users::%player's uuid%::scroll}
+      updateNotepad(player)
+  if full command is "reset 8357":
+    if {Notepad::Users::%player's uuid%::toggle} is true:
+      cancel event
+      delete {Notepad::Users::%player's uuid%::notes::%{_note}%::*}
+      updateNotepad(player)
+
+function updateNotepad(p: player, a: string=""):
+  set {_u} to {_p}'s uuid
+  if {_a} is not "":
+    set {Notepad::Users::%{_u}%::announcer} to formatted {_a}
+  if {Notepad::Users::%{_u}%::toggle} is true:
+    set {_note} to {Notepad::Users::%{_u}%::note}
+    set {_display} to ""
+    if {Notepad::Users::%{_u}%::Notes::%{_note}%::*} is set:
+      loop {Notepad::Users::%{_u}%::Notes::%{_note}%::*}:
+        add 1 to {_i}
+        if {_i} is less than or equal to {Notepad::users::%{_u}%::scroll}:
+          continue loop
+        if {Notepad::Users::%{_u}%::announcer} is not "":
+          if {_i} is more than ({Notepad::users::%{_u}%::scroll} + 11):
+            continue loop
+        else:
+          if {_i} is more than ({Notepad::users::%{_u}%::scroll} + 13):
+            continue loop
+        set {_l} to loop-value
+        replace all "\(" in {_l} with "<"
+        replace all "\)" in {_l} with ">"
+        set {_n::1} to loop-value
+        set {_n::2} to subtext of {_l} from characters 5 to (length of {_l})
+        set {_x} to false
+        if {Notepad::Users::%{_u}%::announcer} is not "":
+          if {_i} is ({Notepad::users::%{_u}%::scroll} + 11):
+            set {_x} to true
+        else:
+          if {_i} is ({Notepad::users::%{_u}%::scroll} + 13):
+            set {_x} to true
+        if {_i} is (size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}):
+          set {_x} to true
+        if {_x} is true:
+          if {Notepad::Users::%{_u}%::theme} is "light":
+            set {_parse::*} to {_l} parsed as "\[x\] %string%"
+            if {_parse::*} is set:
+              set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+              set {_l} to formatted "<command:[%{_i}%] [y] %{_l}%>&7[&c❌&7]<suggest command:[x] %{_l}%> &f%{_l}%<reset>"
+            else:
+              delete {_parse::*}
+              set {_parse::*} to {_l} parsed as "\[y\] %string%"
+              if {_parse::*} is set:
+                set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+                set {_l} to formatted "<command:[%{_i}%] [x] %{_l}%>&7[&a✔&7]<suggest command:[y] %{_l}%> &f%{_l}%<reset>"
+              else:
+                set {_l} to formatted "<suggest command:[%{_i}%] %{_l}%>&7[%{_i}%&7] &f%{_l}%<reset>"
+          else if {Notepad::Users::%{_u}%::theme} is "dark":
+            set {_parse::*} to {_l} parsed as "\[x\] %string%"
+            if {_parse::*} is set:
+              set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+              set {_l} to formatted "<command:[%{_i}%] [y] %{_l}%>&7[&c❌&7]<suggest command:[x] %{_l}%> &f%{_l}%<reset>"
+            else:
+              delete {_parse::*}
+              set {_parse::*} to {_l} parsed as "\[y\] %string%"
+              if {_parse::*} is set:
+                set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+                set {_l} to formatted "<command:[%{_i}%] [x] %{_l}%>&7[&a✔&7]<suggest command:[y] %{_l}%> &f%{_l}%<reset>"
+              else:
+                set {_l} to formatted "<suggest command:[%{_i}%] %{_l}%>&8[%{_i}%&8] &7%{_l}%<reset>"
+        else:
+          if {Notepad::Users::%{_u}%::theme} is "light":
+            set {_parse::*} to {_l} parsed as "\[x\] %string%"
+            if {_parse::*} is set:
+              set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+              set {_l} to formatted "<command:[%{_i}%] [y] %{_l}%>&7[&c❌&7]<suggest command:[x] %{_l}%> &f%{_l}%<reset>%newline%"
+            else:
+              delete {_parse::*}
+              set {_parse::*} to {_l} parsed as "\[y\] %string%"
+              if {_parse::*} is set:
+                set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+                set {_l} to formatted "<command:[%{_i}%] [x] %{_l}%>&7[&a✔&7]<suggest command:[y] %{_l}%> &f%{_l}%<reset>%newline%"
+              else:
+                set {_l} to formatted "<suggest command:[%{_i}%] %{_l}%>&7[%{_i}%&7] &f%{_l}%<reset>%newline%"
+          else if {Notepad::Users::%{_u}%::theme} is "dark":
+            set {_parse::*} to {_l} parsed as "\[x\] %string%"
+            if {_parse::*} is set:
+              set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+              set {_l} to formatted "<command:[%{_i}%] [y] %{_l}%>&7[&c❌&7]<suggest command:[x] %{_l}%> &f%{_l}%<reset>%newline%"
+            else:
+              delete {_parse::*}
+              set {_parse::*} to {_l} parsed as "\[y\] %string%"
+              if {_parse::*} is set:
+                set {_l} to subtext of {_l} from characters 5 to (length of {_l})
+                set {_l} to formatted "<command:[%{_i}%] [x] %{_l}%>&7[&a✔&7]<suggest command:[y] %{_l}%> &f%{_l}%<reset>%newline%"
+              else:
+                set {_l} to formatted "<suggest command:[%{_i}%] %{_l}%>&8[%{_i}%&8] &7%{_l}%<reset>%newline%"
+        set {_display} to formatted "%{_display}%%{_l}%"
+    if {Notepad::Users::%{_u}%::announcer} is not "":
+      if size of {Notepad::Users::%{_u}%::notes::%{_note}%::*} is more than 13:
+        set {_out-of} to " &8(%{Notepad::Users::%{_u}%::scroll} + 13%&8/%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8)"
+      else:
+        set {_out-of} to " &8(%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8/%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8)"
+      set {_notepad} to formatted "&8&m                                &r&8[<tooltip:&7Click to reset the &ascroll&7.%{_out-of}%><command:/scroll-reset 8357>&a●<reset>&8|<tooltip:&7Scroll &aup &7in the notepad.%{_out-of}%><command:/scroll-up 8357>&a↑<reset>&8|<tooltip:&7Scroll &adown &7in the notepad.%{_out-of}%><command:/scroll-down 8357>&a↓<reset>&8]%newline%<tooltip:{@p} &fClick to remove.><command:/removeAnnouncer 8357>%{Notepad::Users::%{_u}%::announcer}%<reset>%newline%&8&m                                &r%newline%&8| <command:/notepad off><tooltip: {@p} &fClick to exit the notepad.>&c&lExit<reset>%newline%&8| <command:/reset 8357><tooltip: {@p} &fClick to reset.>&7&lReset<reset>%newline%&8| &7&lNote &f%{Notepad::Users::%{_u}%::Note} in proper case%%newline%&8| &7&lVersion &f{@version}%newline%&8| &7&lUser &f%{_p}%%newline%&8&m                                &r"
+    else:
+      if size of {Notepad::Users::%{_u}%::notes::%{_note}%::*} is more than 13:
+        set {_out-of} to " &8(%{Notepad::Users::%{_u}%::scroll} + 13%&8/%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8)"
+      else:
+        set {_out-of} to " &8(%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8/%size of {Notepad::Users::%{_u}%::notes::%{_note}%::*}%&8)"
+      set {_notepad} to formatted "&8&m                                &r&8[<tooltip:&7Click to reset the &ascroll&7.%{_out-of}%><command:/scroll-reset 8357>&a●<reset>&8|<tooltip:&7Scroll &aup &7in the notepad.%{_out-of}%><command:/scroll-up 8357>&a↑<reset>&8|<tooltip:&7Scroll &adown &7in the notepad.%{_out-of}%><command:/scroll-down 8357>&a↓<reset>&8]%newline%&8| <command:/notepad off><tooltip: {@p} &fClick to exit the notepad.>&c&lExit<reset>%newline%&8| <command:/reset 8357><tooltip: {@p} &fClick to reset.>&7&lReset<reset>%newline%&8| &7&lNote &f%{Notepad::Users::%{_u}%::Note} in proper case%%newline%&8| &7&lVersion &f{@version}%newline%&8| &7&lUser &f%{_p}%%newline%&8&m                                &r"
+    send formatted "%{Notepad::blank}%%{_display}%%newline%%{_notepad}%" to {_p}

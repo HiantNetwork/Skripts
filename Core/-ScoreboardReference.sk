@@ -1,0 +1,61 @@
+options:
+	servername: &b&lHiant
+	prefix: &e&lScoreboard
+	toggleMessageOn: &aTurned your scoreboard on  
+	toggleMessageOff: &cTurned your scoreboard off
+
+command scoreboard:
+	trigger:
+		if {Scoreboard::%player's uuid%::Toggle} is false:
+			set {Scoreboard::%player's uuid%::Toggle} to true
+			send "{@prefix} &8| {@toggleMessageOn}"
+		else: 
+			set {Scoreboard::%player's uuid%::Toggle} to false 
+			send "{@prefix} &8| {@toggleMessageOff}"
+
+function updateScoreboard(p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_prefix} to {_p}'s prefix ? "&7Default"
+	set {_suffix} to {_p}'s suffix 
+	if {_suffix} is "":
+		set {_suffix} to "&7None"
+	set {_kills} to {Kills::%{S}%::%{_uuid}%} ? 0
+	set {_deaths} to {Deaths::%{S}%::%{_uuid}%} ? 0
+
+	if {_deaths} is 0:
+		set {_kdr} to "Infinity"
+	else:
+		set {_kdr} to {_kills}/{_deaths}
+	set {_tps} to ("%tps from last 5 minutes%" parsed as number)
+	if {_tps} > 18:
+		set {_tps2} to "&a%tps from last 5 minutes%"
+	else if {_tps} > 15:
+		set {_tps2} to "&e%tps from last 5 minutes%"
+	else if {_tps} > 12:
+		set {_tps2} to "&6%tps from last 5 minutes%"
+	else if {_tps} > 10:
+		set {_tps2} to "&c%tps from last 5 minutes%"
+	else:
+		set {_tps2} to "&4%tps from last 5 minutes%"
+	if {Scoreboard::%{_uuid}%::Toggle} is true:
+		toggle scoreboard of {_p} on
+		set title of {_p}'s scoreboard to "{@servername}"
+		set line 13 of {_p}'s scoreboard to "&7"
+		set line 12 of {_p}'s scoreboard to "&7┏ &c%{_p}%"
+		set line 11 of {_p}'s scoreboard to "&7| &eRank &7- &a%{_prefix}%"
+		set line 10 of {_p}'s scoreboard to "&7| &eSuffix &7- &a%{_suffix}%"
+		set line 9 of {_p}'s scoreboard to "&7| &eKills &7- &a%{_kills}%"
+		set line 8 of {_p}'s scoreboard to "&7| &eDeaths &7- &a%{_deaths}%"
+		set line 7 of {_p}'s scoreboard to "&7┗ &eKDR &7- &a%{_kdr}%"
+		set line 6 of {_p}'s scoreboard to "&7"
+		set line 5 of {_p}'s scoreboard to "&7┏ &cServer"
+		set line 4 of {_p}'s scoreboard to "&7| &eTPS &7- %{_tps2}%"
+		set line 3 of {_p}'s scoreboard to "&7┗ &ePlayers Online &7- &a%amount of players%"
+		set line 2 of {_p}'s scoreboard to "&7"
+		set line 1 of {_p}'s scoreboard to "&7Hiant.minehut.gg"
+	else:
+		toggle scoreboard of {_p} off
+
+every tick:
+	loop all players:
+		updateScoreboard(loop-player)

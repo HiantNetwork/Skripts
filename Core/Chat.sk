@@ -28,9 +28,9 @@ on chat:
 		set {_m} to "&7%message%"
 	if uncolored player's suffix is not " " or "":
 		if {clans::%{S}%::Users::%player's uuid%::clan} is set:
-			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% &r%player's suffix% &6[%{clans::%{S}%::Clans::%{clans::%{S}%::Users::%player's uuid%::clan}%::name}%&6] &8» &r%{_m}%"
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% %player's suffix% &6[%{clans::%{S}%::Clans::%{clans::%{S}%::Users::%player's uuid%::clan}%::name}%&6] &8» &r%{_m}%"
 		else:
-			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% &r%player's suffix% &8» &r%{_m}%"
+			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}% %player's suffix% &8» &r%{_m}%"
 	else:
 		if {clans::%{S}%::Users::%player's uuid%::clan} is set:
 			set chat format to "%player's prefix%%colored {Nickname::%player's uuid%}%&r &6[%{clans::%{S}%::Clans::%{clans::%{S}%::Users::%player's uuid%::clan}%::name}%&6] &8» &r%{_m}%"

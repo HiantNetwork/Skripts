@@ -2,8 +2,8 @@ options:
     prefix: &a&lCONFIG &7| &a
     path: "plugins/Skript/scripts/hiant.yml"
 
-on load:
-    set {S} to "Beta"
+#on load:
+#    set {S} to "Beta"
 
 function config_loadYaml(): 
     if yml {@path} is loaded:
@@ -47,6 +47,6 @@ on tab complete:
     event-string is "/config" or "/conf"
     set tab completions for position 1 to "load" and "reload"
 
-on load: 
-    config_loadYaml()
-    set {S} to {config::season}
+#on load: 
+#    config_loadYaml()
+#    set {S} to {config::season}}

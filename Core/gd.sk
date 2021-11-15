@@ -1,0 +1,51 @@
+on chat:
+
+	if message contains "@":
+		send "&cYou can't use ""&e@&c"" in messages, Sorry!" to player
+		cancel event
+
+	if message contains "nigger", "n1gger", "n1gga" or "nigga":
+		execute console command "/mute %sender% Racism"
+		send "%nl%&c%sender% &cdid a racism and got PERM muted.%nl%" to all players
+		cancel event
+	
+	if {clan.%player%} is set:
+		set {_clan} to {clan.%player%}
+	if {clan::%{clan.%player%}%.tagcolor} is set:
+		set {_clancolor} to {clan::%{clan.%player%}%.tagcolor}
+	else if {clan::%{clan.%player%}%.tagcolor} isn't set:
+		set {_clancolor} to ""
+		
+	set {_notset} to ""
+	set {_suffix} to "%player's suffix ? {_notset}%"
+	
+	if {core::chatcolor::%player's uuid%} isn't set:
+		set {_chatcolor} to "&f"
+	
+	if player has permission "chatformat.donator":
+		if {clan.%player%} is set:
+			set chat format to "%{_clancolor}%[%{_clan}%] %player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%message%"
+		else if {clan.%player%} isn't set:
+			set chat format to "%player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%message%"
+
+	if player doesn't have permission "chatformat.donator":
+		if player has permission "chatformat.default":
+			if {clan.%player%} is set:
+				set chat format to "%{_clancolor}%[%{_clan}%] %player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%message%"
+			else if {clan.%player%} isn't set:
+				set chat format to "%player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%message%"
+
+	if player has permission "chatformat.admin":
+		if {clan.%player%} is set:
+			set chat format to "%{_clancolor}%[%{_clan}%] %player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%colored message%"
+		else if {clan.%player%} isn't set:
+			set chat format to "%player's prefix%%player's displayname%%{_suffix}%&7: &f%{core::chatcolor::%player's uuid%} ? {_chatcolor}%%colored message%"
+
+command /alert [<text>]:
+	permission: admin.core.alert
+	permission message: &cYou do not have permission to execute this command!
+	trigger:
+		if arg-1 is not set:
+			send "&cInvalid usage! &7/alert <text>"
+		else if arg-1 is set:
+			send formatted colored arg-1 to all players

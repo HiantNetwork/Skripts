@@ -14,18 +14,18 @@ function enchants_setVariables2():
 	set {enchants::category::shovel::items::*} to netherite shovel, diamond shovel, gold shovel, iron shovel, stone shovel and wood shovel
 	set {enchants::category::hoe::items::*} to netherite hoe, diamond hoe, gold hoe, iron hoe, stone hoe and wood hoe
 	set {enchants::category::trident::items::*} to trident
-	set {enchants::category::enchantedbook::items::*} to book
+	set {enchants::category::enchanted book::items::*} to book
 
-	set {enchants::category::sword::enchants::*} to unbreaking, mending, curse of vanishing, sharpness, fire aspect, mending, knockback, sweeping edge, efficiency, smite, curse of vanishing, smite and unbreaking
-	set {enchants::category::armor::enchants::*} to unbreaking, mending, curse of vanishing, blast protection, curse of binding, feather falling, fire protection, projectile protection, protection, soul speed and thorns
-	set {enchants::category::bow::enchants::*} to unbreaking, mending, curse of vanishing, flame, infinity, power and punch 
-	set {enchants::category::crossbow::enchants::*} to unbreaking, mending, curse of vanishing, flame, infinity, power, punch, multishot, piercing and quick charge
-	set {enchants::category::axe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency, silk touch and sharpness
-	set {enchants::category::pickaxe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency, fortune and silk touch
-	set {enchants::category::shovel::enchants::*} to unbreaking, mending, curse of vanishing, efficiency and silk touch
-	set {enchants::category::hoe::enchants::*} to unbreaking, mending, curse of vanishing, efficiency and silk touch
-	set {enchants::category::trident::enchants::*} to unbreaking, mending, curse of vanishing, impaling, loyalty, riptide and piercing
-	set {enchants::category::enchantedbook::enchants::*} to (indexes of {enchants::list::*} parsed as enchantment types)
+	set {enchants::category::sword::enchants::*} to unbreaking, mending, sharpness, fire aspect, knockback, sweeping edge, curse of vanishing and smite
+	set {enchants::category::armor::enchants::*} to unbreaking, mending, blast protection, Curse Of binding, feather falling, fire protection, projectile protection, protection, soul speed and thorns
+	set {enchants::category::bow::enchants::*} to unbreaking, mending, flame, infinity, power and punch 
+	set {enchants::category::crossbow::enchants::*} to unbreaking, mending, flame, infinity, power, punch, multishot, piercing and quick charge
+	set {enchants::category::axe::enchants::*} to unbreaking, mending, efficiency, silk touch and sharpness
+	set {enchants::category::pickaxe::enchants::*} to unbreaking, mending, efficiency, fortune and silk touch
+	set {enchants::category::shovel::enchants::*} to unbreaking, mending, efficiency and silk touch
+	set {enchants::category::hoe::enchants::*} to unbreaking, mending, efficiency and silk touch
+	set {enchants::category::trident::enchants::*} to unbreaking, mending, impaling, loyalty, riptide and piercing
+	set {enchants::category::enchanted book::enchants::*} to (indices of {enchants::list::*})
 
 function enchants_setVariables1():
     #Sharpness

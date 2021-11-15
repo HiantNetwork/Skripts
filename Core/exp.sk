@@ -1,0 +1,4 @@
+command ineedexp:
+    trigger:
+        give 10000000000 xp to the player
+        send "&aGave you xp, this should be enough"

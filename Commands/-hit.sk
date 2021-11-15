@@ -1,0 +1,11 @@
+command /hit [<integer>] <player>:
+	permission: *
+	trigger:
+		set {_loop} to arg-1 ? 1
+		set {_set} to player's gamemode
+		loop {_loop} times:
+			set gamemode of arg-2 to survival
+			damage arg-2 by 1
+			push arg-2 backwards with speed 5
+			set gamemode of arg-2 to {_set}
+			wait 1 second

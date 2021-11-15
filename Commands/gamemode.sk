@@ -1,13 +1,20 @@
 command gamemode [<text>] [<player>]:
 	aliases: gm
-	permission: staff.gamemode
-	permission message: {config::messages.noperms}
 	trigger:
+		if player does not have permission "command.gamemode" or "command.gamemode.*":
+			send {config::messages.noperms} to player
+			stop
 		if arg 1 is not "creative" or "c" or "survival" or "s" or "spectator" or "sp" or "adventure" or "t" or "a":
 			send "&e%arg 1% &7is not a valid gamemode"
 			stop
 		if arg 1 is "creative" or "c":
+			if player does not have permission "command.gamemode.creative" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
 			if arg 2 is set:
+				if player does not have permission "command.gamemode.creative.others" or "command.gamemode.*":
+					send {config::messages.noperms} to player
+					stop
 				if arg 2's gamemode is creative:
 					send "&e%arg 2% &7is already in &aCreative"
 					stop
@@ -22,7 +29,13 @@ command gamemode [<text>] [<player>]:
 			send "&7Your gamemode has been updated to &aCreative" to player
 			stop
 		if arg 1 is "survival" or "s":
+			if player does not have permission "command.gamemode.survival" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
 			if arg 2 is set:
+				if player does not have permission "command.gamemode.survival.others" or "command.gamemode.*":
+					send {config::messages.noperms} to player
+					stop
 				if arg 2's gamemode is survival:
 					send "&e%arg 2% &7is already in &aSurvival"
 					stop
@@ -37,7 +50,13 @@ command gamemode [<text>] [<player>]:
 			send "&7Your gamemode has been updated to &aSurvival" to player
 			stop
 		if arg 1 is "spectator" or "sp":
+			if player does not have permission "command.gamemode.spectator" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
 			if arg 2 is set:
+				if player does not have permission "command.gamemode.spectator.others" or "command.gamemode.*":
+					send {config::messages.noperms} to player
+					stop
 				if arg 2's gamemode is spectator:
 					send "&e%arg 2% &7is already in &aSpectator"
 					stop
@@ -52,7 +71,13 @@ command gamemode [<text>] [<player>]:
 			send "&7Your gamemode has been updated to &aSpectator" to player
 			stop
 		if arg 1 is "adventure" or "t" or "a":
+			if player does not have permission "command.gamemode.adventure" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
 			if arg 2 is set:
+				if player does not have permission "command.gamemode.adventure.others" or "command.gamemode.*":
+					send {config::messages.noperms} to player
+					stop
 				if arg 2's gamemode is adventure:
 					send "&e%arg 2% &7is already in &aAdventure"
 					stop
@@ -66,4 +91,100 @@ command gamemode [<text>] [<player>]:
 			set player's gamemode to adventure
 			send "&7Your gamemode has been updated to &aAdventure" to player
 			stop
-			
+
+command gmc [<player>]:
+	trigger:
+		if player does not have permission "command.gamemode.creative" or "command.gamemode.*":
+			send {config::messages.noperms} to player
+			stop
+		if arg 1 is set:
+			if player does not have permission "command.gamemode.creative.others" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
+			if arg 1's gamemode is creative:
+				send "&e%arg 1% &7is already in &aCreative"
+				stop
+			set arg 1's gamemode to creative
+			send "&e%arg 1%&e's &7gamemode has been set to &aCreative" to executor
+			send "&7Your gamemode has been updated to &aCreative" to arg 1 if arg 1 is not executor
+			stop
+		if player's gamemode is creative:
+			send "&7Your already in &aCreative &7mode!"
+			stop
+		set player's gamemode to creative
+		send "&7Your gamemode has been updated to &aCreative" to player
+		stop
+		
+command gms [<player>]:
+	trigger:
+		if player does not have permission "command.gamemode.survival" or "command.gamemode.*":
+			send {config::messages.noperms} to player
+			stop
+		if arg 1 is set:
+			if player does not have permission "command.gamemode.survival.others" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
+			if arg 1's gamemode is survival:
+				send "&e%arg 1% &7is already in &aSurvival"
+				stop
+			set arg 1's gamemode to survival
+			send "&e%arg 1%&e's &7gamemode has been set to &aSurvival" to executor
+			send "&7Your gamemode has been updated to &aSurvival" to arg 1 if arg 1 is not executor
+			stop
+		if player's gamemode is survival:
+			send "&7Your already in &aSurvival &7mode!"
+			stop
+		set player's gamemode to survival
+		send "&7Your gamemode has been updated to &aSurvival" to player
+		stop
+	
+command gmsp [<player>]:
+	trigger:
+		if player does not have permission "command.gamemode.spectator" or "command.gamemode.*":
+			send {config::messages.noperms} to player
+			stop
+		if arg 1 is set:
+			if player does not have permission "command.gamemode.spectator.others" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
+			if arg 1's gamemode is spectator:
+				send "&e%arg 1% &7is already in &aSpectator"
+				stop
+			set arg 1's gamemode to spectator
+			send "&e%arg 1%&e's &7gamemode has been set to &aSpectator" to executor
+			send "&7Your gamemode has been updated to &aSpectator" to arg 1 if arg 1 is not executor
+			stop
+		if player's gamemode is spectator:
+			send "&7Your already in &aSpectator &7mode!"
+			stop
+		set player's gamemode to spectator
+		send "&7Your gamemode has been updated to &aSpectator" to player
+		stop
+		
+command gma [<player>]:
+	aliases: gmt
+	trigger:
+		if player does not have permission "command.gamemode.adventure" or "command.gamemode.*":
+			send {config::messages.noperms} to player
+			stop
+		if arg 1 is set:
+			if player does not have permission "gamemode.adventure.others" or "command.gamemode.*":
+				send {config::messages.noperms} to player
+				stop
+			if arg 1's gamemode is adventure:
+				send "&e%arg 1% &7is already in &aAdventure"
+				stop
+			set arg 1's gamemode to adventure
+			send "&e%arg 1%&e's &7gamemode has been set to &aAdventure" to executor
+			send "&7Your gamemode has been updated to &aAdventure" to arg 1 if arg 1 is not executor
+			stop
+		if player's gamemode is adventure:
+			send "&7Your already in &aAdventure &7mode!"
+			stop
+		set player's gamemode to adventure
+		send "&7Your gamemode has been updated to &aAdventure" to player
+		stop
+		
+on tab complete:
+    if event-string is "/gamemode" or "/gm":
+        set tab completions for position 1 to "creative", "survival", "spectator", "adventure"

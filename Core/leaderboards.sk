@@ -21,7 +21,7 @@ function lb_updateKissLeaderboard():
 	set {_uuids::*} to sortKisses()
 	set {_i} to 1
 	loop 10 times:
-		set {_p} to {_uuids::%{_i}%} parsed as offline player 
+		set {_p} to {_uuids::%{_i}%} parsed as player 
 		execute console command "/hd setline kiss %{_i} + 2% &a%{_i}%. &d%{_p}'s name% &7- &c%{Kiss::%{_uuids::%{_i}%}%}%"
 		add 1 to {_i}
 

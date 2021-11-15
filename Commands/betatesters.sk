@@ -8,33 +8,33 @@ command betatester [<text>] [<offlineplayer>]:
 			if arg-2 is not set:
 				send "{@prefix} &8| &cPlease set a players name in arg 2"
 				stop 
-			add arg-2 to {betatesters::list::*}
+			add arg-2's uuid to {betatesters::list::*}
 			send "{@prefix} &8| &aAdded &6%arg-2%&a to the beta testers whitelist"
 		else if arg-1 is "remove":
 			if arg-2 is not set:
 				send "{@prefix} &8| &cPlease set a players name in arg 2"
 				stop 
-			remove arg-2 from {betatesters::list::*}
+			remove arg-2's uuid from {betatesters::list::*}
 			send "{@prefix} &8| &aRemoved &6%arg-2%&a from the beta testers whitelist"
 		else if arg-1 is "list":
 			set {_temp::1} to text component of "{@prefix} &8| &aList of BetaTesters%newline%"
 			set {_i} to 1
 			loop {betatesters::list::*}:
 				add 1 to {_i}
-				set {_p} to loop-value
+				set {_p} to (loop-value parsed as an offlineplayer)
 				set {_temp::%{_i}%} to text component of "&a%{_p}'s name% "
 			send component {_temp::*}
 		else if arg-1 is "whitelist":
 			loop {betatesters::list::*}:
-				add loop-value to whitelist 
+				add (loop-value parsed as offline player) to whitelist 
 			send "{@prefix} &8| &aAdded all betatesters to the whitelist"
 		else if arg-1 is "unwhitelist":
 			loop {betatesters::list::*}:
-				remove loop-value from whitelist 
+				remove (loop-value parsed as offline player) from whitelist 
 			send "{@prefix} &8| &aRemoved all betatesters from the whitelist"
 		else if arg-1 is "kickall":
 			loop {betatesters::list::*}:
-				kick loop-value due to "&bAll Betatesters Kicked"
+				kick (loop-value parsed as offline player) due to "&bAll Betatesters Kicked"
 			send "{@prefix} &8| &aKicked all beta testers"
 
 on tab complete:

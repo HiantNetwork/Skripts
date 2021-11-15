@@ -1,0 +1,20 @@
+options:
+	world: S1
+
+function extinguishWoodGen():
+	set {_a::1} to location at (-17, 1, -124) in world "{@world}"
+	set {_a::2} to location at (10, 12, -97) in world "{@world}"
+
+	loop blocks within {_a::1} and {_a::2}:
+		loop-block is fire
+		set loop-block to air
+
+every 2 minutes:
+	extinguishWoodGen()
+	
+on block ignite:
+	if "%region at (block 1 meters north of the event-location)%" is "spawn in world %{config::world}%":
+		cancel event
+	else if "%region at (block 2 meters north of the event-location)%" is "spawn in world %{config::world}%":
+		block north event-location is red wool
+		cancel event

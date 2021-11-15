@@ -10,71 +10,71 @@ options:
 
 on load:
 	login to {config::discord.token} with name "{@botname}"
-	make embed:
-		set color of the embed to light blue
-		set author of the embed to "The server is now online"
-	send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
-	make new discord command:
-		set discord name of command to "link"
-		set description of command to "Link your account to minecraft!"
-		register require option STRING with id "link" and with description "Link your account to minecraft!" to command
+	#make embed:
+	#	set color of the embed to light blue
+	#	set author of the embed to "The server is now online"
+	#send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+	#make new discord command:
+	#	set discord name of command to "link"
+	#	set description of command to "Link your account to minecraft!"
+	#	register require option STRING with id "link" and with description "Link your account to minecraft!" to command
 	add command builder to {_cmd::*}
 	create {_cmd::*} with bot named "{@botname}"	
 
-on unload:
-	make embed:
-		set color of the embed to light blue
-		set author of the embed to "The server is now online"
-		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
-on chat:
-	set {_msg} to message 
-	set {_this::*} to split "_.*.>.|.`" at "."
-	loop {_this::*}:
-		replace all loop-value in {_msg} with "\%loop-value%"
-	replace all "@" in {_msg} with "||@||"
-	send "{@format}" to channel with id "{@minecraftchat}" with bot "{@botname}"
+#on unload:
+	#make embed:
+	#	set color of the embed to light blue
+	#	set author of the embed to "The server is now online"
+	#	send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+#on chat:
+#	set {_msg} to message 
+#	set {_this::*} to split "_.*.>.|.`" at "."
+#	loop {_this::*}:
+#		replace all loop-value in {_msg} with "\%loop-value%"
+#	replace all "@" in {_msg} with "||@||"
+#	send "{@format}" to channel with id "{@minecraftchat}" with bot "{@botname}"
 
-on guild message receive seen by "{@botname}":
-	if event-channel is channel with id "{@minecraftchat}":
-		if event-member is a discord bot:
-			stop
-		else:
-			set {_player} to "%discord name of event-member%##%discord tag of event-member%"
-			broadcast "{@discordformat}"
-			stop
+#on guild message receive seen by "{@botname}":
+#	if event-channel is channel with id "{@minecraftchat}":
+#		if event-member is a discord bot:
+#			stop
+#		else:
+#			set {_player} to "%discord name of event-member%##%discord tag of event-member%"
+#			broadcast "{@discordformat}"
+#			stop
 
-on first join:
-	make embed:
-		set color of the embed to green
-		set author of the embed to "%player% join for first time"
-		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+#on first join:
+#	make embed:
+#		set color of the embed to green
+#		set author of the embed to "%player% join for first time"
+#		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
 		
-on join:
-	make embed:
-		set color of the embed to light blue
-		set author of the embed to "%player% joined"
-		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+#on join:
+#	make embed:
+#		set color of the embed to light blue
+#		set author of the embed to "%player% joined"
+#		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
 
-on quit:
-	make embed:
-		set color of the embed to red
-		set author of the embed to "%player% left"
-		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
+#on quit:
+#	make embed:
+#		set color of the embed to red
+#		set author of the embed to "%player% left"
+#		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"
 
-on death:
-	victim is a player
-	make embed:
-		set color of the embed to black
-		if attacker is a player:
-			set author of the embed to "%victim% was slain by %attacker%"		
-		if attacker is a player:
-			if projectile is set:
-				set author of the embed to "%victim% was shot by %attacker%"	
-		if damage was caused by potion:
-			set author of the embed to "%victim% was killed by spooky witch magic"
-		else:
-			set author of the embed to "%victim% died."			
-		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"	
+#on death:
+#	victim is a player
+#	make embed:
+#		set color of the embed to black
+#		if attacker is a player:
+#			set author of the embed to "%victim% was slain by %attacker%"		
+#		if attacker is a player:
+#			if projectile is set:
+#				set author of the embed to "%victim% was shot by %attacker%"	
+#		if damage was caused by potion:
+#			set author of the embed to "%victim% was killed by spooky witch magic"
+#		else:
+#			set author of the embed to "%victim% died."			
+#		send last made embed to channel with id "{@minecraftchat}" with bot "{@botname}"	
 	
 discord command link [<offline player>] [<number>]:
 	prefixes: !

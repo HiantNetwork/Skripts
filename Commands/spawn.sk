@@ -1,5 +1,5 @@
 command /setspawn:	
-	permission: op	
+	permission: command.setspawn	
 	trigger:		
 		set {spawn::%{S}%} to location of block at location of player
 		send "&bSpawn Location: &c&l%{spawn::%{S}%}%" to player

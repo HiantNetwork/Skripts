@@ -17,9 +17,13 @@ on inventory click:
 		else if event-slot is 39:
 			set {_item} to slot 13 of (metadata tag "{@gui1Name}" of player)
 			if {_item} is not air:
-				give player {_item}
+				if player's inventory can hold {_item}:
+					give player {_item}
+				else:
+					drop {_item} at location of player without velocity
 				set slot 13 of (metadata tag "{@gui1Name}" of player) to air
 				send "{@prefix} &eCanceled enchant, you have been given your item"
+				close player's inventory
 	else if event-inventory is (metadata tag "{@gui2Name}" of player):
 		cancel event
 		if event-slot is 45:

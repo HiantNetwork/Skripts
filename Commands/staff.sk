@@ -3,7 +3,7 @@ options:
 	scprefix:&8[&4StaffChat&8]&7
 
 command /mutechat:
-	permission: skript.staff.mutechat
+	permission: command.staff.mutechat
 	permission message: &cThis is a staff only command
 	trigger:
 		if {Moderation::chatGlobalMute} is true:
@@ -18,10 +18,10 @@ command /clearchat:
 	permission message: &cThis is a staff only command
 	trigger:
 		loop 200 times:
-			send "&b" to all players where [input does not have permission "staff.clearchat.bypass"]
+			send "&b" to all players where [input does not have permission "command.clearchat.bypass"]
 		wait 0.1 seconds
-		send "&4%player% &7has cleared the chat!" to all players where [input has permission "staff.clearchat.bypass"]
-		send "&7The chat has been &ccleared" to all players where [input does not have permission "staff.clearchat.bypass"]
+		send "&4%player% &7has cleared the chat!" to all players where [input has permission "command.clearchat.bypass"]
+		send "&7The chat has been &ccleared" to all players where [input does not have permission "command.clearchat.bypass"]
 
 command /schat [<text>]:
 	aliases: /sc
@@ -29,7 +29,7 @@ command /schat [<text>]:
 	permission message: &cThis is a staff only command
 	trigger:
 		if arg-1 is set:
-			send "{@scprefix} &c%player's display name%&f: &f%arg 1%" to all players where [player has permission "skript.staff.staffchat"]
+			send "{@scprefix} &c%player's display name%&f: &f%arg 1%" to all players where [input has permission "command.staff.staffchat"]
 		else:
 			set {_m} to {Moderation::staffChat::%player's uuid%}
 			if {_m} is true:
@@ -43,7 +43,7 @@ on chat:
 	event is not cancelled
 	if {Moderation::staffChat::%player's uuid%} is true:
 		cancel event
-		send "{@scprefix} &c%player's display name%&f: &f%message%" to all players where [player has permission "sskript.staff.staffchat"]
+		send "{@scprefix} &c%player's display name%&f: &f%message%" to all players where [input has permission "command.staff.staffchat"]
 		stop
 	if {Moderation::chatGlobalMute} is true:
 		if player does not have permission "skript.staff.mutechat.bypass":

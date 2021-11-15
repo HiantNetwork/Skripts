@@ -9,3 +9,11 @@ command /invsee [<offlineplayer>]:
 			send "{@prefix} &aPlease set an argument in argument 1"
 			stop
 		open inventory of arg to player
+
+command endersee [<offlineplayer>]:
+	permission: staff.endersee
+	trigger:
+		if arg is not set:
+			send "{@prefix} &aPlease set an argument in argument 1"
+			stop
+		open enderchest of arg to player

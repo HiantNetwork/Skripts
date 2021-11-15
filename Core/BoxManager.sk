@@ -1,3 +1,6 @@
+options:
+	world: S1
+
 command clearbox:
 	permission: staff.clearbox
 	permission message: "&cAre you TRYING to cause lag?"
@@ -14,9 +17,9 @@ command clearbox:
 		
 		wait 2 seconds
 		
-		set {_Spawn::Block1} to location at (-8, 106, -176) in world "S1"
-		set {_Spawn::Block2} to location at (0, 100, -176) in world "S1"
-		set {_Quadrants::StartBlock} to location at (-4, 1, -88) in world "S1"
+		set {_Spawn::Block1} to location at (-8, 106, -176) in world "{@world}"
+		set {_Spawn::Block2} to location at (0, 100, -176) in world "{@world}"
+		set {_Quadrants::StartBlock} to location at (-4, 1, -88) in world "{@world}"
 		
 		loop blocks within {_Spawn::Block1} and {_Spawn::Block2}:
 			set loop-block to tinted glass
@@ -27,38 +30,49 @@ command clearbox:
 		
 		loop all players:
 			wait 0.1 seconds
+			"%region at loop-player%" does not contain "spawn"
 			teleport loop-player to {spawn::%{S}%}
 		
-		set {_Quadrant::1::TopBlock} to location at (83, 254, -175) in world "S1"
+		set {_Quadrant::1::TopBlock} to location at (83, 254, -175) in world "{@world}"
+
+		broadcast "&b"
+		broadcast "&6[Box Manager]&a Mobs &6- &eCleared &6- &420%%"
+		broadcast "&b"
 		
+		loop entities in world "{@world}":
+			"%region at loop-entity%" does not contain "spawn"
+			delete loop-entity
+		
+		wait 1 second
+
 		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::1::TopBlock}:
 			set loop-block to air
 			
 		broadcast "&b"
-		broadcast "&6[Box Manager]&a Quadrant One &6- &eCleared &6- &425%%"
+		broadcast "&6[Box Manager]&a Quadrant One &6- &eCleared &6- &c40%%"
 		broadcast "&b"
 		
 		wait 2 seconds
 		
-		set {_Quadrant::2::TopBlock} to location at (-91, 254, -175) in world "S1"
+		set {_Quadrant::2::TopBlock} to location at (-91, 254, -175) in world "{@world}"
 		
 		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::2::TopBlock}: 	 
 			set loop-block to air
 			
 		broadcast "&b"
-		broadcast "&6[Box Manager]&a Quadrant Two &6- &eCleared &6- &e50%%"
+		broadcast "&6[Box Manager]&a Quadrant Two &6- &eCleared &6- &e60%%"
 		broadcast "&b"
 		
-		set {_Quadrant::3::TopBlock} to location at (-91, 254, -1) in world "S1"
+		set {_Quadrant::3::TopBlock} to location at (-91, 254, -1) in world "{@world}"
 		
 		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::3::TopBlock}: 	 
 			set loop-block to air
 			
 		broadcast "&b"
-		broadcast "&6[Box Manager]&a Quadrant Three &6- &eCleared &6- &675%%"
+		broadcast "&6[Box Manager]&a Quadrant Three &6- &eCleared &6- &680%%"
 		broadcast "&b"
 		
-		set {_Quadrant::4::TopBlock} to location at (83, 254, -1) in world "S1"
+		set {_Quadrant::4::TopBlock} to location at (83, 254, -1) in world "{@world}"
 		
 		loop blocks within {_Quadrants::StartBlock} and {_Quadrant::4::TopBlock}: 	 
 			set loop-block to air

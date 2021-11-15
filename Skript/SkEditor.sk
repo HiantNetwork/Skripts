@@ -287,6 +287,7 @@ on chat:
     if message is "[CANCEL]":
       send "{@p} &cCancelled the search!"
       delete {SkriptEditorGUI::%player's uuid%::chatInput}
+      stop trigger
     set {SkriptEditorGUI::users::%player's uuid%::filter} to "search:%message%"
     delete {SkriptEditorGUI::users::%player's uuid%::chatInput}
     openSkriptEditor(player)

@@ -1,0 +1,22 @@
+command /tp [<player>] [<player>]:
+	permission: command.teleport
+	aliases: /teleport
+	trigger:
+		if arg 1 is not set:
+			send "&cYou must provide a valid player argument"
+			stop
+		if arg-2 is not set:
+			teleport player to arg-1
+			send "&aSuccessfully &7teleported to &e%arg 1%" to executor
+		if arg-2 is set:
+			teleport arg-1 to arg-2
+			send "&aSuccessfully &7teleported &e%arg 1% &7to &e%arg 2%" to executor
+			
+command /tphere [<player>]:
+	permission: command.tphere
+	trigger:
+		if arg 1 is not set:
+			send "&cYou must provide a valid player argument"
+			stop
+		teleport arg-1 to player
+		send "&aSuccessfully &7teleported &e%arg 1% &7to &eYou" to executor

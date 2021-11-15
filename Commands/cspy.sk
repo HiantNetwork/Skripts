@@ -2,7 +2,7 @@ options:
 	prefix: &6&lCSPY
 
 command CommandSpy:
-	permission: skript.staff.CommandSpy
+	permission: command.CommandSpy
 	aliases: Cspy
 	trigger:
 		if {cspy::%{S}%::%player's uuid%} is true:
@@ -15,9 +15,11 @@ command CommandSpy:
 on command:
 	if {DisableCommand::%player's uuid%} is true:
 		send "&cCommands are disabled for you"
-		stop 
+		stop
 	loop all players:
-		if {cspy::%{S}%::%loop-player's uuid%} is true:
-			if loop-player has permission "skript.staff.CommandSpy":
-				if sender is player:
-					send "{@prefix} &8| &6%sender% &eExecuted the command &e/%complete command%" to loop-player
+		loop-player has permission "skript.staff.CommandSpy"
+		{cspy::%{S}%::%loop-player's uuid%} is true
+		sender is player
+		executor is not loop-player
+		send "{@prefix} &8| &6%sender% &eExecuted the command &e/%complete command%" to loop-player
+					
